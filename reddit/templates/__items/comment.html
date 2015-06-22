@@ -1,0 +1,33 @@
+{% load humanize %}
+
+<div class="media">
+    <div class="media-left">
+        <div class="vote comment-votes"
+             data-what-type="comment"
+             data-what-id="{{ comment.id }}">
+            {% with vote_value=comment_votes|get_item:comment.id %}
+                <div><i class="fa fa-chevron-up {% if vote_value == 1 %} upvoted {% endif %}"
+                        title="upvote" onclick="vote(this)"></i>
+                </div>
+                <div><i class="fa fa-chevron-down {% if vote_value == -1 %} downvoted {% endif %}"
+                        title="downvote"
+                        onclick="vote(this)"></i></div>
+            {% endwith %}
+        </div>
+    </div>
+    <div class="media-body"
+         data-parent-id="{{ comment.id }}"
+         data-parent-type="comment">
+        <h5 class="media-heading"><a href="/user/{{ comment.author_name }}">{{ comment.author_name }}</a>
+            <a class='score'> {{ comment.score }}</a> points posted {{ comment.timestamp|naturaltime }}</h5>
+        {{ comment.html_comment|safe }}
+        <div class="reply-container">
+            <ul class="buttons">
+                <li><a href="javascript:void(0)" name="replyButton">reply</a></li>
+            </ul>
+        </div>
+        {% for comment in comment.children.all %}
+            {% include '__items/comment.html' %}
+        {% endfor %}
+    </div>
+</div>

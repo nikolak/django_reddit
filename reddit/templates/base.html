@@ -1,0 +1,50 @@
+{% load staticfiles %}
+
+
+<!DOCTYPE html>
+<html lang="" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>{% block title %}Django Reddit{% endblock %}</title>
+    <link rel="shortcut icon" href="">
+    <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    {#    <link rel="stylesheet" href="{% static "css/bootstrap-theme.min.css" %}">#}
+    <link rel="stylesheet" href="{% static "css/reddit.css" %}">
+    <link rel="stylesheet" href="{% static "css/font-awesome.min.css" %}">
+
+    <!--[if IE]>
+<script src="https://cdn.jsdelivr.net/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://cdn.jsdelivr.net/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+
+<body>
+
+{% block navbar %}
+    {% include '__layout/navbar.html' %}
+{% endblock %}
+{% for message in messages %}
+    <div class="alert alert-dismissible alert-{{ message.tags }}">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        {{ message }}
+    </div>
+{% endfor %}
+
+<div class="container">
+    {% block content %}
+        <a>There's nothing here!</a>
+    {% endblock %}
+</div>
+
+{% include '__layout/footer.html' %}
+
+<script src="{% static "js/jquery-1.11.1.min.js" %}"></script>
+<script src="{% static "js/bootstrap.min.js" %}"></script>
+<script src="{% static 'js/reddit.js' %} "></script>
+{% block js %}
+{% endblock %}
+</body>
+</html>

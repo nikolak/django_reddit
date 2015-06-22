@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <form class="form-signin" method="post" action="{% url 'reddit.views.register' %}">
+        {% csrf_token %}
+        <h2 class="form-signin-heading">Register</h2>
+
+        {% for field in form %}
+            {{ field }}
+            {% for error in field.errors %}
+                <p class="text-danger">{{ error }}</p>
+
+            {% endfor %}
+        {% endfor %}
+
+        {% if username_exists %}
+            <p class="text-danger">Username already exists</p>
+        {% endif %}
+
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+        <h5>Already have an account? <a href="{% url 'reddit.views.user_login' %}">Login</a></h5>
+    </form>
+{% endblock %}

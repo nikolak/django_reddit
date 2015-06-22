@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form class="form-horizontal" action="/submit/" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>New submission</legend>
+
+            {% for field in form %}
+
+                <div class="form-group">
+                    <label for="id_{{ field.name }}" class="col-lg-2 control-label">{{ field.name|capfirst }}</label>
+
+                    <div class="col-lg-10">
+                        {% for error in field.errors %}
+                            <p class="text-danger">{{ error }}</p>
+
+                        {% endfor %}
+                        {{ field }}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="form-group">
+                <div class="col-lg-10 col-lg-offset-2">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+
+{% endblock %}
