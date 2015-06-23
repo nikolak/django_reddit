@@ -32,7 +32,7 @@ def frontpage(request):
     """
     # TODO: Serve user votes on submissions too.
 
-    all_submissions = Submission.objects.all()
+    all_submissions = Submission.objects.order_by('-score').all()
     paginator = Paginator(all_submissions, 25)
 
     page = request.GET.get('page')
