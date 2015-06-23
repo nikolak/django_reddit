@@ -83,18 +83,13 @@ def comments(request, thread_id=None):
 
     if reddit_user:
         try:
-            print this_submission, reddit_user
             user_thread_votes = Vote.objects.filter(user=reddit_user,
                                                     submission=this_submission)
-            print len(user_thread_votes)
 
             for vote in user_thread_votes:
-                print vote
                 comment_votes[vote.vote_object.id] = vote.value
         except:
             pass
-
-    print comment_votes
 
     return render(request, 'public/comments.html', {'submission': this_submission,
                                                     'comments': thread_comments,
