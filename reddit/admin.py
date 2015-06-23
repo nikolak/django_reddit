@@ -17,7 +17,6 @@ class SubmissionAdmin(admin.ModelAdmin):
 class RedditUserAdmin(admin.ModelAdmin):
     inlines = [
         SubmissionInline,
-        CommentsInline
     ]
 
 admin.site.register(RedditUser, RedditUserAdmin)
