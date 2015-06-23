@@ -5,9 +5,12 @@ from django.contrib import messages
 from django.template.defaulttags import register
 from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseForbidden
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from reddit.forms import UserForm, SubmissionForm
+
 from django.contrib.auth.models import User
+
+from reddit.forms import UserForm, SubmissionForm
 from reddit.models import RedditUser, Submission, Comment, Vote
+
 
 @register.filter
 def get_item(dictionary, key):
@@ -27,7 +30,7 @@ def frontpage(request):
     Serves frontpage and all additional submission listings
     with maximum of 25 submissions per page.
     """
-    #TODO: Serve user votes on submissions too.
+    # TODO: Serve user votes on submissions too.
 
     all_submissions = Submission.objects.all()
     paginator = Paginator(all_submissions, 25)
@@ -40,7 +43,20 @@ def frontpage(request):
     except EmptyPage:
         submissions = paginator.page(paginator.num_pages)
 
-    return render(request, 'public/frontpage.html', {'submissions': submissions})
+    submission_votes = {}
+
+    if request.user.is_authenticated():
+        for submission in submissions:
+            try:
+                vote = Vote.objects.get(vote_object_type=submission.get_content_type(),
+                                        vote_object_id=submission.id,
+                                        user=RedditUser.objects.get(user=request.user))
+                submission_votes[submission.id] = vote.value
+            except Vote.DoesNotExist:
+                pass
+
+    return render(request, 'public/frontpage.html', {'submissions': submissions,
+                                                     'submission_votes': submission_votes})
 
 
 def comments(request, thread_id=None):
@@ -77,8 +93,6 @@ def comments(request, thread_id=None):
         pass
 
     comment_votes = {}
-
-
 
     if reddit_user:
         try:
@@ -119,7 +133,7 @@ def user_login(request):
                               {'login_error': "Account disabled"})
         else:
             return render(request, 'public/login.html',
-                              {'login_error': "Wrong username or password."})
+                          {'login_error': "Wrong username or password."})
 
     return render(request, 'public/login.html')
 
