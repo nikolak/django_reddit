@@ -58,8 +58,8 @@ def comments(request, thread_id=None):
     if not this_submission:
         return Http404()
 
-    thread_comments = Comment.objects.filter(submission=this_submission,
-                                             parent=None).all()
+    thread_comments = Comment.objects.filter(submission=this_submission).all()
+
 
     if request.user.is_authenticated():
         try:
@@ -346,8 +346,8 @@ def test_data(request):
     if not request.user.is_staff:
         return HttpResponseForbidden("There's nothing to see here.")
 
-    thread_count = request.GET.get('threads', 10)
-    root_comments = request.GET.get('comments', 10)
+    thread_count = int(request.GET.get('threads', 10))
+    root_comments = int(request.GET.get('comments', 10))
 
     from random import choice, randint
     from string import letters
