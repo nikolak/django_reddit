@@ -3,10 +3,28 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from mptt.models import MPTTModel, TreeForeignKey
 import mistune
 
 
 class ContentTypeAware(models.Model):
+    def get_content_type(self):
+        """
+        :return: Content type for this instance.
+        """
+        return ContentType.objects.get_for_model(self)
+
+    def get_content_type_id(self):
+        """
+
+        :return: Content type ID for this instance
+        """
+        return self.get_content_type().pk
+
+    class Meta:
+        abstract = True
+
+class MttpContentTypeAware(MPTTModel):
     def get_content_type(self):
         """
         :return: Content type for this instance.
@@ -61,16 +79,19 @@ class Submission(ContentTypeAware):
         return "<Submission:{}>".format(self.id)
 
 
-class Comment(ContentTypeAware):
-    author = models.ForeignKey(RedditUser)
+class Comment(MttpContentTypeAware):
+    author = models.CharField(null=False, max_length=12)
     submission = models.ForeignKey(Submission)
-    parent = models.ForeignKey('self', related_name='children', null=True)
+    parent = TreeForeignKey('self', related_name='children', null=True, db_index=True)
     timestamp = models.DateTimeField(default=timezone.now)
     ups = models.IntegerField(default=0)
     downs = models.IntegerField(default=0)
     score = models.IntegerField(default=0)
     raw_comment = models.TextField(blank=True)
     html_comment = models.TextField(blank=True)
+
+    class MPTTMeta:
+        order_insertion_by = ['score']
 
     @classmethod
     def create(cls, author, raw_comment, parent):
@@ -89,7 +110,7 @@ class Comment(ContentTypeAware):
         """
 
         html_comment = mistune.markdown(raw_comment)  # todo: any exceptions possible?
-        comment = cls(author=author,
+        comment = cls(author=author.user.username,
                       raw_comment=raw_comment,
                       html_comment=html_comment)
 
@@ -106,10 +127,6 @@ class Comment(ContentTypeAware):
         submission.save()
 
         return comment
-
-    @property
-    def author_name(self):
-        return self.author.user.username
 
     def __unicode__(self):
         return "<Comment:{}>".format(self.id)

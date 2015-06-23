@@ -58,14 +58,6 @@
         </fieldset>
     </form>
 
-    {#    Comments block#}
-
-    <ul class="media-list">
-        {% for comment in comments %}
-            <li class="media comment-media">
-                {% include "__items/comment.html" %}
-            </li>
-        {% endfor %}
-    </ul>
+    {% include '__items/comment.html' %}
 
 {% endblock %}
