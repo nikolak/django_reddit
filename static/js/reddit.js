@@ -30,21 +30,49 @@ function vote(voteButton) {
         if (response.error == null) {
             var voteDiff = response.voteDiff;
             var $score = null;
-            if ($data.whatType=='submission'){
+            var $upvoteArrow = null;
+            var $downArrow = null;
+            if ($data.whatType == 'submission') {
                 $score = $voteDiv.find("div.score");
-            } else if($data.whatType=='comment'){
+                $upvoteArrow = $voteDiv.children("div").children('i.fa.fa-chevron-up');
+                $downArrow = $voteDiv.children("div").children('i.fa.fa-chevron-down');
+            } else if ($data.whatType == 'comment') {
                 var $medaiDiv = $voteDiv.parent().parent();
+                var $votes = $medaiDiv.children('div.media-left').children('div.vote').children('div');
+                $upvoteArrow = $votes.children('i.fa.fa-chevron-up');
+                $downArrow = $votes.children('i.fa.fa-chevron-down');
                 $score = $medaiDiv.find('div.media-body:first').find("a.score:first");
-            }
-            console.log($score.text());
-            console.log(voteDiff);
-            var scoreInt = parseInt($score.text());
-            $score.text(scoreInt+=voteDiff);
 
-            console.log("No error")
+            }
+
+            // update vote elements
+
+            if (vote_value == -1) {
+                if ($upvoteArrow.hasClass("upvoted")) { // remove upvote, if any.
+                    $upvoteArrow.removeClass("upvoted")
+                }
+                if ($downArrow.hasClass("downvoted")) { // Canceled downvote
+                    $downArrow.removeClass("downvoted")
+                } else {                                // new downvote
+                    $downArrow.addClass("downvoted")
+                }
+            } else if (vote_value == 1) {               // remove downvote
+                if ($downArrow.hasClass("downvoted")) {
+                    $downArrow.removeClass("downvoted")
+                }
+
+                if ($upvoteArrow.hasClass("upvoted")) { // if canceling upvote
+                    $upvoteArrow.removeClass("upvoted")
+                } else {                                // adding new upvote
+                    $upvoteArrow.addClass("upvoted")
+                }
+            }
+
+            // update score element
+            var scoreInt = parseInt($score.text());
+            $score.text(scoreInt += voteDiff);
         }
     });
-    //console.log(what + id);
 }
 
 function getCookie(name) {
@@ -72,7 +100,6 @@ function submitEvent(event, form) {
     event.preventDefault();
     var $form = form;
     var data = $form.data();
-    console.log(data);
     url = $form.attr("action");
     commentContent = $form.find("textarea#commentContent").val();
 
