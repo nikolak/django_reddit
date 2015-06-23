@@ -58,8 +58,7 @@ def comments(request, thread_id=None):
     if not this_submission:
         return Http404()
 
-    thread_comments = Comment.objects.filter(submission=this_submission).all()
-
+    thread_comments = Comment.objects.filter(submission=this_submission)
 
     if request.user.is_authenticated():
         try:

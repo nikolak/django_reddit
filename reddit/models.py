@@ -91,7 +91,7 @@ class Comment(MttpContentTypeAware):
     html_comment = models.TextField(blank=True)
 
     class MPTTMeta:
-        order_insertion_by = ['score']
+        order_insertion_by = ['-score']
 
     @classmethod
     def create(cls, author, raw_comment, parent):
