@@ -5,32 +5,35 @@
 
     <table>
         <tbody>
-            {% for submission in submissions %}
-                <tr>
-                    <td>
-                        <div class="vote">
-                            <div><i class="fa fa-chevron-up" title="upvote"
-                                    onclick="upvote('t', {{ submission.id }})"></i>
-                            </div>
-                            <div class="score" title="score">{{ submission.score }}</div>
-                            <div><i class="fa fa-chevron-down" title="downvote"
-                                    onclick="downvote('t', {{ submission.id }})"></i></div>
+        {% for submission in submissions %}
+            <tr>
+                <td>
+                    <div class="vote"
+                         data-what-type="submission"
+                         data-what-id="{{ submission.id }}">
+                        <div><i class="fa fa-chevron-up {% if  sub_vote == 1 %} upvoted {% endif %}"
+                                title="upvote" onclick="vote(this)"></i>
                         </div>
-                    </td>
-                    <td class="info-container">
-                        <a class="thread-title" href="{{ submission.linked_url }}">{{ submission.title }}</a>
-                        <br>
-                        <h6 class="thread-info">submitted {{ submission.timestamp|naturaltime }} by <a
-                                href="#">{{ submission.author_name }}</a></h6>
+                        <div class="score" title="score">{{ submission.score }}</div>
+                        <div><i class="fa fa-chevron-down{% if  sub_vote == -1 %} downvoted {% endif %}"
+                                title="downvote"
+                                onclick="vote(this)"></i></div>
+                    </div>
+                </td>
+                <td class="info-container">
+                    <a class="thread-title" href="{{ submission.linked_url }}">{{ submission.title }}</a>
+                    <br>
+                    <h6 class="thread-info">submitted {{ submission.timestamp|naturaltime }} by <a
+                            href="#">{{ submission.author_name }}</a></h6>
 
-                        <ul class="buttons">
-                            <li><a href="{{ submission.comments_url }}">{{ submission.comment_count }} comments</a></li>
-                        </ul>
+                    <ul class="buttons">
+                        <li><a href="{{ submission.comments_url }}">{{ submission.comment_count }} comments</a></li>
+                    </ul>
 
 
-                    </td>
-                </tr>
-            {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 
@@ -44,7 +47,8 @@
             {% endif %}
 
             {% if submissions.has_next %}
-                <li class="next"><a href="?page={{ submissions.next_page_number }}">Next <span aria-hidden="true">&rarr;</span></a></li>
+                <li class="next"><a href="?page={{ submissions.next_page_number }}">Next <span
+                        aria-hidden="true">&rarr;</span></a></li>
             {% else %}
                 <li class="next disabled"><a href="#">Next <span aria-hidden="true">&rarr;</span></a></li>
             {% endif %}
