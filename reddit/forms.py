@@ -90,7 +90,7 @@ class ProfileForm(forms.ModelForm):
         model = RedditUser
         fields = ('first_name', 'last_name', 'email',
                   'display_picture', 'about_text',
-                  'homepage','github', 'twitter')
+                  'homepage', 'github', 'twitter')
 
 
 class SubmissionForm(forms.ModelForm):

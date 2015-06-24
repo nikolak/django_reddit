@@ -109,11 +109,13 @@ def comments(request, thread_id=None):
                                                     'comment_votes': comment_votes,
                                                     'sub_vote': sub_vote_value})
 
+
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
-    profile = RedditUser.objects.get(user = user)
+    profile = RedditUser.objects.get(user=user)
 
-    return render(request, 'public/profile.html', {'profile':profile})
+    return render(request, 'public/profile.html', {'profile': profile})
+
 
 @login_required
 def edit_profile(request):
@@ -132,9 +134,7 @@ def edit_profile(request):
     else:
         return Http404()
 
-
     return render(request, 'private/edit_profile.html', {'form': profile_form})
-
 
 
 def user_login(request):
