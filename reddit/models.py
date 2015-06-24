@@ -9,33 +9,24 @@ import mistune
 
 class ContentTypeAware(models.Model):
     def get_content_type(self):
-        """
-        :return: Content type for this instance.
-        """
+        """:return: Content type for this instance."""
         return ContentType.objects.get_for_model(self)
 
     def get_content_type_id(self):
-        """
-
-        :return: Content type ID for this instance
-        """
+        """:return: Content type ID for this instance"""
         return self.get_content_type().pk
 
     class Meta:
         abstract = True
 
+
 class MttpContentTypeAware(MPTTModel):
     def get_content_type(self):
-        """
-        :return: Content type for this instance.
-        """
+        """:return: Content type for this instance."""
         return ContentType.objects.get_for_model(self)
 
     def get_content_type_id(self):
-        """
-
-        :return: Content type ID for this instance
-        """
+        """:return: Content type ID for this instance"""
         return self.get_content_type().pk
 
     class Meta:
@@ -44,6 +35,19 @@ class MttpContentTypeAware(MPTTModel):
 
 class RedditUser(models.Model):
     user = models.OneToOneField(User)
+    first_name = models.CharField(max_length=35,null=True, default=None)
+    last_name = models.CharField(max_length=35, null=True, default=None)
+    email = models.EmailField(null=True, blank=True, default=None)
+    about_text = models.TextField(blank=True,null=True, max_length=500, default=None)
+    about_html = models.TextField(blank=True,null=True,default=None)
+    gravatar_hash = models.CharField(max_length=32,null=True,blank=True, default=None)
+    display_picture = models.NullBooleanField(default=False)
+    homepage = models.URLField(null=True, blank=True, default=None)
+    twitter = models.CharField(null=True,blank=True, max_length=15, default=None)
+    github = models.CharField(null=True, max_length=39, default=None)
+
+    comment_karma = models.IntegerField(default=0)
+    link_karma = models.IntegerField(default=0)
 
     def __unicode__(self):
         return "<RedditUser:{}>".format(self.user.username)
