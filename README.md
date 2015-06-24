@@ -7,6 +7,10 @@ Reddit clone written in python using django web framework and twitter's bootstra
 
 ![desktop_submission](_screenshots/desktop_submission 2015-06-22.jpg?raw=true)
 
+![profile_view](_screenshots/profile_view 2015-06-24.png)
+
+![profile_edit](_screenshots/profile_edit 2015-06-24.png)
+
 Fully responsive:
 
 ![mobile_frontpage](_screenshots/mobile_frontpage 2015-06-22.png?raw=true)
