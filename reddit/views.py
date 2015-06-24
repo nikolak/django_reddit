@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.template.defaulttags import register
@@ -110,7 +110,10 @@ def comments(request, thread_id=None):
                                                     'sub_vote': sub_vote_value})
 
 def user_profile(request, username):
-    return render(request, 'public/profile.html')
+    user = get_object_or_404(User, username=username)
+    profile = RedditUser.objects.get(user = user)
+
+    return render(request, 'public/profile.html', {'profile':profile})
 
 @login_required
 def edit_profile(request):
