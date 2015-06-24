@@ -36,8 +36,8 @@ class MttpContentTypeAware(MPTTModel):
 
 class RedditUser(models.Model):
     user = models.OneToOneField(User)
-    first_name = models.CharField(max_length=35,null=True, default=None)
-    last_name = models.CharField(max_length=35, null=True, default=None)
+    first_name = models.CharField(max_length=35,null=True, default=None, blank=True)
+    last_name = models.CharField(max_length=35, null=True, default=None, blank=True)
     email = models.EmailField(null=True, blank=True, default=None)
     about_text = models.TextField(blank=True,null=True, max_length=500, default=None)
     about_html = models.TextField(blank=True,null=True,default=None)
