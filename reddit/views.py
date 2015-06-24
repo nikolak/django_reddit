@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User
 
-from reddit.forms import UserForm, SubmissionForm
+from reddit.forms import UserForm, SubmissionForm, ProfileForm
 from reddit.models import RedditUser, Submission, Comment, Vote
 
 
@@ -108,6 +108,30 @@ def comments(request, thread_id=None):
                                                     'comments': thread_comments,
                                                     'comment_votes': comment_votes,
                                                     'sub_vote': sub_vote_value})
+
+def user_profile(request, username):
+    return render(request, 'public/profile.html')
+
+@login_required
+def edit_profile(request):
+    user = RedditUser.objects.get(user=request.user)
+
+    if request.method == 'GET':
+        profile_form = ProfileForm(instance=user)
+
+    elif request.method == 'POST':
+        profile_form = ProfileForm(request.POST, instance=user)
+        if profile_form.is_valid():
+            profile = profile_form.save(commit=False)
+            profile.update_profile_data()
+            profile.save()
+            messages.success(request, "Profile settings saved")
+    else:
+        return Http404()
+
+
+    return render(request, 'private/edit_profile.html', {'form': profile_form})
+
 
 
 def user_login(request):
