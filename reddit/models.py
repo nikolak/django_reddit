@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from mptt.models import MPTTModel, TreeForeignKey
+from hashlib import md5
 import mistune
 
 
@@ -48,6 +49,11 @@ class RedditUser(models.Model):
 
     comment_karma = models.IntegerField(default=0)
     link_karma = models.IntegerField(default=0)
+
+    def update_profile_data(self):
+        self.about_html=mistune.markdown(self.about_text)
+        if self.display_picture:
+            self.gravatar_hash = md5(self.email.lower()).hexdigest()
 
     def __unicode__(self):
         return "<RedditUser:{}>".format(self.user.username)
