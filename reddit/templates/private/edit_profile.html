@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <form class="form-horizontal" action="/profile/edit/" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Edit your profile</legend>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="first_name" class="col-lg-2 control-label">First Name</label>
+
+                        <div class="col-lg-10">
+                            {{ form.first_name }}
+                            {% for error in form.first_name.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="last_name" class="col-lg-2 control-label">Last Name</label>
+
+                        <div class="col-lg-10">
+                            {{ form.last_name }}
+                            {% for error in form.last_name.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="email" class="col-lg-2 control-label">Email</label>
+
+                        <div class="col-lg-10">
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label">Profile Picture</label>
+
+                        <div class="col-lg-10">
+                            <div class="checkbox ">
+                                <label>
+                                    {{ form.display_picture }} Show picture (uses gravatar and your email).
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="about_me" class="col-lg-2 control-label">About me</label>
+
+                <div class="col-lg-10">
+                    {{ form.about_text }}
+                    {% for error in form.about_text.errors %}
+                        <p class="text-danger">{{ error }}</p>
+                    {% endfor %}
+                    <span class="help-block">Up to 500 characters of about me text that will be displayed on your proifle page.</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="homepage" class="col-lg-2 control-label">Website</label>
+
+                        <div class="col-lg-10">
+                            {{ form.homepage }}
+                            {% for error in form.homepage.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="github" class="control-label">GitHub</label>
+
+                        <div class="input-group col-lg-10">
+                            <span class="input-group-addon">https://github.com/</span>
+                            {{ form.github }}
+                            {% for error in form.github.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="twitter" class="control-label">Twitter</label>
+
+                        <div class="input-group col-lg-10">
+                            <span class="input-group-addon">http://twitter.com/</span>
+                            {{ form.twitter }}
+                            {% for error in form.twitter.errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="col-lg-10 col-lg-offset-2">
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+
+        </fieldset>
+    </form>
+
+{% endblock %}
