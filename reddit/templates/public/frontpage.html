@@ -26,7 +26,7 @@
                     <a class="thread-title" href="{{ submission.linked_url }}">{{ submission.title }}</a>
                     <br>
                     <h6 class="thread-info">submitted {{ submission.timestamp|naturaltime }} by <a
-                            href="#">{{ submission.author_name }}</a></h6>
+                            href="/user/{{ submission.author_name }}">{{ submission.author_name }}</a></h6>
 
                     <ul class="buttons">
                         <li><a href="{{ submission.comments_url }}">{{ submission.comment_count }} comments</a></li>
