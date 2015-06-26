@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 
 from reddit.forms import UserForm, SubmissionForm, ProfileForm
 from reddit.models import RedditUser, Submission, Comment, Vote
+from utils.helpers import post_only, get_only
 
 
 @register.filter
@@ -164,13 +165,11 @@ def user_login(request):
 
     return render(request, 'public/login.html')
 
-
+@post_only
 def user_logout(request):
     """
     Log out user if one is logged in and redirect them to frontpage.
     """
-    if not request.method == "POST":
-        return HttpResponseBadRequest()
 
     if request.user.is_authenticated():
         logout(request)
@@ -204,7 +203,7 @@ def register(request):
 
     return render(request, 'public/register.html', {'form': user_form})
 
-
+@post_only
 def post_comment(request):
     if not request.user.is_authenticated():
         return JsonResponse({'msg': "You need to log in to post new comments."})
@@ -240,7 +239,7 @@ def post_comment(request):
     comment.save()
     return JsonResponse({'msg': "Your comment has been posted."})
 
-
+@post_only
 def vote(request):
     # The type of object we're voting on, can be 'submission' or 'comment'
     vote_object_type = request.POST.get('what', None)
@@ -375,6 +374,7 @@ def submit(request):
 
 
 @login_required
+@get_only
 def test_data(request):
     """
     Quick and dirty way to create 10 random submissions random comments each
