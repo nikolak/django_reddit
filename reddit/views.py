@@ -396,7 +396,6 @@ def test_data(request):
         return ''.join(choice(letters) for i in range(length))
 
     random_usernames = [get_random_username() for _ in range(100)]
-    print random_usernames
 
     def get_random_sentence(min_words=3, max_words=50,
                             min_word_len=3,
@@ -439,7 +438,7 @@ def test_data(request):
     for _ in range(thread_count):
         print "Creating new submission."
         selftext = get_random_sentence()
-        title = get_random_sentence(max_words=10, max_word_len=10)
+        title = get_random_sentence(max_words=100, max_word_len=10)
         author = get_or_create_author(choice(random_usernames))
         ups = randint(0, 1000)
         url = None
@@ -454,6 +453,7 @@ def test_data(request):
                                 downs=downs,
                                 score=ups - downs,
                                 comment_count=comments)
+        submission.generate_html()
         submission.save()
 
         for _ in range(root_comments):
