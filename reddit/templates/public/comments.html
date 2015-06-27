@@ -2,62 +2,60 @@
 {% load humanize %}
 
 {% block content %}
-
     {#    Submission block#}
-    <table>
-        <tbody>
-        <tr>
-            <td>
-                <div class="vote"
-                     data-what-type="submission"
-                     data-what-id="{{ submission.id }}">
-                    <div><i class="fa fa-chevron-up {% if  sub_vote == 1 %} upvoted {% endif %}"
-                            title="upvote" onclick="vote(this)"></i>
-                    </div>
-                    <div class="score" title="score">{{ submission.score }}</div>
-                    <div><i class="fa fa-chevron-down{% if  sub_vote == -1 %} downvoted {% endif %}"
-                            title="downvote"
-                            onclick="vote(this)"></i></div>
+
+    <div class="media">
+        <div class="media-left">
+            <div class="vote"
+                 data-what-type="submission"
+                 data-what-id="{{ submission.id }}">
+                <div><i class="fa fa-chevron-up {% if  sub_vote == 1 %} upvoted {% endif %}"
+                        title="upvote" onclick="vote(this)"></i>
                 </div>
-            </td>
-            <td class="info-container">
+                <div class="score" title="score">{{ submission.score }}</div>
+                <div><i class="fa fa-chevron-down{% if  sub_vote == -1 %} downvoted {% endif %}"
+                        title="downvote"
+                        onclick="vote(this)"></i></div>
+            </div>
+        </div>
+        <div class="media-body">
+            <div class="reply-container">
                 <a class="thread-title" href="{{ submission.linked_url }}">{{ submission.title }}</a>
                 <br>
                 <h6 class="thread-info">submitted {{ submission.timestamp|naturaltime }} by <a
                         href="/user/{{ submission.author_name }}">{{ submission.author_name }}</a></h6>
-
+                {{ submission.text_html|safe }}
                 <ul class="buttons">
                     <li><a href="{{ submission.comments_url }}">{{ submission.comment_count }} comments</a></li>
                 </ul>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    {#    New comment block#}
-
-    <form id="commentForm" class="form-horizontal"
-          action="/post/comment/"
-          data-parent-type="submission"
-          data-parent-id="{{ submission.id }}">
-        <fieldset>
-
-            <div class="form-group comment-group">
-                <label for="commentContent" class="col-lg-2 control-label">New comment</label>
-
-                <div class="col-lg-10">
-                    <textarea class="form-control" rows="3" id="commentContent"></textarea>
-                    <span id="postResponse" class="text-success" style="display: none"></span>
-                </div>
             </div>
-            <div class="form-group">
-                <div class="col-lg-10 col-lg-offset-2">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </div>
-        </fieldset>
-    </form>
+        </div>
 
-    {% include '__items/comment.html' %}
+
+        {#    New comment block#}
+
+        <form id="commentForm" class="form-horizontal"
+              action="/post/comment/"
+              data-parent-type="submission"
+              data-parent-id="{{ submission.id }}">
+            <fieldset>
+
+                <div class="form-group comment-group">
+                    <label for="commentContent" class="col-lg-2 control-label">New comment</label>
+
+                    <div class="col-lg-10">
+                        <textarea class="form-control" rows="3" id="commentContent"></textarea>
+                        <span id="postResponse" class="text-success" style="display: none"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-lg-10 col-lg-offset-2">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+        {% include '__items/comment.html' %}
 
 {% endblock %}
