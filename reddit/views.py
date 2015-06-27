@@ -363,6 +363,7 @@ def submit(request):
         submission_form = SubmissionForm(request.POST)
         if submission_form.is_valid():
             submission = submission_form.save(commit=False)
+            submission.generate_html()
             user = User.objects.get(username=request.user)
             redditUser = RedditUser.objects.get(user=user)
             submission.author = redditUser
