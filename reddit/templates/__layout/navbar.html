@@ -28,7 +28,7 @@
                             <li class="disabled"><a href="#">Messages <span class="badge">0</span></a></li>
                             <li class="divider"></li>
                             <li>
-                                <form id="logoutForm" action="{% url 'reddit.views.user_logout' %}" method="post">
+                                <form id="logoutForm" action="/logout/" method="post">
                                     {% csrf_token %}
                                 </form>
                                 <a onclick="$(this).parent().find('#logoutForm').submit()" href="#">Logout</a>
