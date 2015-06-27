@@ -64,11 +64,17 @@ class Submission(ContentTypeAware):
     title = models.CharField(max_length=250)
     url = models.URLField(null=True, blank=True)
     text = models.TextField(max_length=5000, blank=True)
+    text_html = models.TextField(blank=True)
     ups = models.IntegerField(default=0)
     downs = models.IntegerField(default=0)
     score = models.IntegerField(default=0)
     timestamp = models.DateTimeField(default=timezone.now)
     comment_count = models.IntegerField(default=0)
+
+    def generate_html(self):
+        if self.text:
+            html = mistune.markdown(self.text)
+            self.text_html = html
 
     @property
     def author_name(self):
