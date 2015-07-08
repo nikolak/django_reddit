@@ -3,10 +3,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.template.defaulttags import register
-from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseForbidden, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
 
 from reddit.forms import UserForm, SubmissionForm, ProfileForm
 from reddit.models import RedditUser, Submission, Comment, Vote
@@ -165,6 +166,7 @@ def user_login(request):
 
     return render(request, 'public/login.html')
 
+
 @post_only
 def user_logout(request):
     """
@@ -203,6 +205,7 @@ def register(request):
 
     return render(request, 'public/register.html', {'form': user_form})
 
+
 @post_only
 def post_comment(request):
     if not request.user.is_authenticated():
@@ -238,6 +241,7 @@ def post_comment(request):
 
     comment.save()
     return JsonResponse({'msg': "Your comment has been posted."})
+
 
 @post_only
 def vote(request):
@@ -374,8 +378,7 @@ def submit(request):
     return render(request, 'public/submit.html', {'form': submission_form})
 
 
-@login_required
-@get_only
+@csrf_exempt
 def test_data(request):
     """
     Quick and dirty way to create 10 random submissions random comments each
@@ -384,17 +387,27 @@ def test_data(request):
     Should be removed in production.
 
     """
-    if not request.user.is_staff:
-        return HttpResponseForbidden("There's nothing to see here.")
+    get_page = """
+    <form action="/populate/" method="POST">
+    Threads: <input type="number" name="threads" value=10></input>
+    Root comments: <input type="number" name="comments" value=10></input>
+    <button type="submit">Create</button>
+    </form>
+    """
+    if not request.user.is_authenticated() or not request.user.is_staff:
+        return Http404()
 
-    thread_count = int(request.GET.get('threads', 10))
-    root_comments = int(request.GET.get('comments', 10))
+    if request.method == "GET":
+        return HttpResponse(get_page)
+
+    thread_count = int(request.POST.get('threads', 10))
+    root_comments = int(request.POST.get('comments', 10))
 
     from random import choice, randint
     from string import letters
 
     def get_random_username(length=6):
-        return ''.join(choice(letters) for i in range(length))
+        return ''.join(choice(letters) for _ in range(length))
 
     random_usernames = [get_random_username() for _ in range(100)]
 
