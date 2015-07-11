@@ -17,6 +17,13 @@ class ContentTypeAware(models.Model):
         """:return: Content type ID for this instance"""
         return self.get_content_type().pk
 
+    def add_vote(self, vote_value):
+        self.score += vote_value
+        if vote_value == 1:
+            self.ups += 1
+        elif vote_value == -1:
+            self.downs += 1
+
     class Meta:
         abstract = True
 
@@ -94,7 +101,6 @@ class Submission(ContentTypeAware):
 
 class Comment(MttpContentTypeAware):
     author_name = models.CharField(null=False, max_length=12)
-    # author = models.CharField(null=False, max_length=12)
     author = models.ForeignKey(RedditUser)
     submission = models.ForeignKey(Submission)
     parent = TreeForeignKey('self', related_name='children', null=True, db_index=True)
@@ -126,7 +132,7 @@ class Comment(MttpContentTypeAware):
 
         html_comment = mistune.markdown(raw_comment)  # todo: any exceptions possible?
         comment = cls(author=author,
-                      author_username = author.user.username,
+                      author_name = author.user.username,
                       raw_comment=raw_comment,
                       html_comment=html_comment)
 
@@ -175,8 +181,10 @@ class Vote(models.Model):
 
         if isinstance(vote_object, Submission):
             submission = vote_object
+            vote_object.author.link_karma+=vote_value
         else:
             submission = vote_object.submission
+            vote_object.author.comment_karma += vote_value
 
         vote = cls(user=user,
                    vote_object=vote_object,
@@ -192,5 +200,64 @@ class Vote(models.Model):
             vote_object.downs += 1
 
         vote_object.save()
+        vote_object.author.save()
 
         return vote
+
+    def change_vote(self, new_vote_value):
+        if self.value == -1 and new_vote_value == 1:  # down to up
+            vote_diff = 2
+            self.vote_object.score += 2
+            self.vote_object.ups += 1
+            self.vote_object.downs -= 1
+        elif self.value == 1 and new_vote_value == -1:  # up to down
+            vote_diff = -2
+            self.vote_object.score -= 2
+            self.vote_object.ups -= 1
+            self.vote_object.downs += 1
+        elif self.value == 0 and new_vote_value == 1:  # canceled vote to up
+            vote_diff = 1
+            self.vote_object.ups += 1
+            self.vote_object.score += 1
+        elif self.value == 0 and new_vote_value == -1:  # canceled vote to down
+            vote_diff = -1
+            self.vote_object.downs += 1
+            self.vote_object.score -= 1
+        else:
+            return None
+
+        if isinstance(self.vote_object, Submission):
+            self.vote_object.author.link_karma+=vote_diff
+        else:
+            self.vote_object.author.comment_karma += vote_diff
+
+        self.value = new_vote_value
+        self.vote_object.save()
+        self.vote_object.author.save()
+        self.save()
+        print self.vote_object.author.link_karma
+
+        return vote_diff
+
+    def cancel_vote(self):
+        if self.value == 1:
+            vote_diff = -1
+            self.vote_object.ups -= 1
+            self.vote_object.score -= 1
+        elif self.value == -1:
+            vote_diff = 1
+            self.vote_object.downs -= 1
+            self.vote_object.score += 1
+        else:
+            return None
+
+        if isinstance(self.vote_object, Submission):
+            self.vote_object.author.link_karma+=vote_diff
+        else:
+            self.vote_object.author.comment_karma += vote_diff
+
+        self.value = 0
+        self.save()
+        self.vote_object.save()
+        self.vote_object.author.save()
+        return vote_diff

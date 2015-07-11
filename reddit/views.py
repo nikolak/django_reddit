@@ -220,9 +220,7 @@ def post_comment(request):
 
     if not raw_comment:
         return JsonResponse({'msg': "You have to write something."})
-
     author = RedditUser.objects.get(user=request.user)
-
     try:  # try and get comment or submission we're voting on
         if parent_type == 'comment':
             parent_object = Comment.objects.get(id=parent_id)
@@ -312,44 +310,14 @@ def vote(request):
     # being canceled (same value) or changed (different new_vote_value)
     if vote.value == new_vote_value:
         # canceling vote
-        if vote.value == 1:
-            vote_diff = -1
-            vote.vote_object.ups -= 1
-            vote.vote_object.score -= 1
-        elif vote.value == -1:
-            vote_diff = 1
-            vote.vote_object.downs -= 1
-            vote.vote_object.score += 1
-
-        vote.value = 0
-        vote.vote_object.save()
-        vote.save()
+        vote_diff = vote.cancel_vote()
+        if not vote_diff:
+            return HttpResponseBadRequest('Something went wrong while canceling the vote')
     else:
         # changing vote
-        if vote.value == -1 and new_vote_value == 1:  # down to up
-            vote_diff = 2
-            vote.vote_object.score += 2
-            vote.vote_object.ups += 1
-            vote.vote_object.downs -= 1
-        elif vote.value == 1 and new_vote_value == -1:  # up to down
-            vote_diff = -2
-            vote.vote_object.score -= 2
-            vote.vote_object.ups -= 1
-            vote.vote_object.downs += 1
-        elif vote.value == 0 and new_vote_value == 1:  # canceled vote to up
-            vote_diff = 1
-            vote.vote_object.ups += 1
-            vote.vote_object.score += 1
-        elif vote.value == 0 and new_vote_value == -1:  # canceled vote to down
-            vote_diff = -1
-            vote.vote_object.downs += 1
-            vote.vote_object.score -= 1
-        else:
+        vote_diff = vote.change_vote(new_vote_value)
+        if not vote_diff:
             return HttpResponseBadRequest('Wrong values for old/new vote combination')
-
-        vote.value = new_vote_value
-        vote.vote_object.save()
-        vote.save()
 
     return JsonResponse({'error': None,
                          'voteDiff': vote_diff})
