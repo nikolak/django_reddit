@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from reddit.forms import UserForm, SubmissionForm, ProfileForm
 from reddit.models import RedditUser, Submission, Comment, Vote
-from utils.helpers import post_only, get_only
+from reddit.utils.helpers import post_only, get_only
 
 
 @register.filter
