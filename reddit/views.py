@@ -72,9 +72,8 @@ def comments(request, thread_id=None):
     :param thread_id: Thread ID as it's stored in database
     :type thread_id: int
     """
-    this_submission = Submission.objects.get(id=thread_id)
-    if not this_submission:
-        return Http404()
+
+    this_submission = get_object_or_404(Submission, id=thread_id)
 
     thread_comments = Comment.objects.filter(submission=this_submission)
 
