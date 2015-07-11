@@ -60,6 +60,7 @@ class RedditUser(models.Model):
 
 
 class Submission(ContentTypeAware):
+    author_name = models.CharField(null=False, max_length=12)
     author = models.ForeignKey(RedditUser)
     title = models.CharField(max_length=250)
     url = models.URLField(null=True, blank=True)
@@ -77,10 +78,6 @@ class Submission(ContentTypeAware):
             self.text_html = html
 
     @property
-    def author_name(self):
-        return self.author.user.username
-
-    @property
     def linked_url(self):
         if self.url:
             return "{}".format(self.url)
@@ -96,7 +93,9 @@ class Submission(ContentTypeAware):
 
 
 class Comment(MttpContentTypeAware):
-    author = models.CharField(null=False, max_length=12)
+    author_name = models.CharField(null=False, max_length=12)
+    # author = models.CharField(null=False, max_length=12)
+    author = models.ForeignKey(RedditUser)
     submission = models.ForeignKey(Submission)
     parent = TreeForeignKey('self', related_name='children', null=True, db_index=True)
     timestamp = models.DateTimeField(default=timezone.now)
@@ -126,7 +125,8 @@ class Comment(MttpContentTypeAware):
         """
 
         html_comment = mistune.markdown(raw_comment)  # todo: any exceptions possible?
-        comment = cls(author=author.user.username,
+        comment = cls(author=author,
+                      author_username = author.user.username,
                       raw_comment=raw_comment,
                       html_comment=html_comment)
 
