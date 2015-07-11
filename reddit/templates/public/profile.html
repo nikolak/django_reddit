@@ -7,14 +7,19 @@
                 <div class="well profile">
                     <div class="col-sm-12">
                         <div class="col-xs-12 col-sm-8">
-                            <h2>{{ profile.first_name }} {{ profile.last_name }}
+                            <h2>{% if profile.first_name %}{{ profile.first_name }}{% endif %}
+                                {% if profile.last_name %}{{ profile.last_name }} {% endif %}
                                 <small>({{ profile.user.username }})</small>
                             </h2>
 
                             <p><strong>About: </strong></p>
 
                             <p>
+                                {% if profile.about_html %}
                                 {{ profile.about_html|safe }}
+                                {% else %}
+                                <p>User has not entered anything here</p>
+                                {% endif %}
                             </p>
                         </div>
                         <div class="col-xs-12 col-sm-4 text-center">
