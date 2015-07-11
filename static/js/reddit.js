@@ -153,16 +153,16 @@ var newCommentForm = '<form id="commentForm" class="form-horizontal"\
 
 
 $('a[name="replyButton"]').click(function () {
-    var $mediaBody = $(this).parent().parent().parent().parent();
+    var $mediaBody = $(this).parent().parent().parent();
     if ($mediaBody.find('#commentForm').length == 0) {
         $mediaBody.parent().find(".reply-container:first").append(newCommentForm);
         var $form = $mediaBody.find('#commentForm');
-        $form.data('parent-id', $mediaBody.data().parentId);
+        $form.data('parent-id', $mediaBody.parent().data().parentId);
         $form.submit(function (event) {
             submitEvent(event, $(this));
         });
     } else {
-        $commentForm = $mediaBody.find('#commentForm');
+        $commentForm = $mediaBody.find('#commentForm:first');
         if ($commentForm.attr('style') == null) {
             $commentForm.css('display', 'none')
         } else {
