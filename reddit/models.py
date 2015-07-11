@@ -45,7 +45,7 @@ class RedditUser(models.Model):
     display_picture = models.NullBooleanField(default=False)
     homepage = models.URLField(null=True, blank=True, default=None)
     twitter = models.CharField(null=True,blank=True, max_length=15, default=None)
-    github = models.CharField(null=True, max_length=39, default=None)
+    github = models.CharField(null=True, blank=True, max_length=39, default=None)
 
     comment_karma = models.IntegerField(default=0)
     link_karma = models.IntegerField(default=0)
