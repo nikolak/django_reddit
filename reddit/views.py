@@ -200,7 +200,7 @@ def register(request):
             reddit_user.user = user
             reddit_user.save()
             messages.success(request, 'You have successfully registered! You can log in now')
-            return render(request, 'public/login.html')
+            return redirect('Login')
 
     return render(request, 'public/register.html', {'form': user_form})
 
