@@ -15,7 +15,7 @@ from reddit.utils.helpers import post_only, get_only
 
 
 @register.filter
-def get_item(dictionary, key):
+def get_item(dictionary, key): # pragma: no cover
     """
     Needed because there's no built in .get in django templates
     when working with dictionaries.
