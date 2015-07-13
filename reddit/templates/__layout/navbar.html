@@ -30,6 +30,7 @@
                             <li>
                                 <form id="logoutForm" action="/logout/" method="post">
                                     {% csrf_token %}
+                                    <input type="hidden" name="current_page" value="{{ request.path }}">
                                 </form>
                                 <a onclick="$(this).parent().find('#logoutForm').submit()" href="#">Logout</a>
                             </li>
