@@ -1,12 +1,12 @@
 from django.test import TestCase, Client
-from django.contrib.auth.models import  User
+from django.contrib.auth.models import User
 
 
 class TestLogout(TestCase):
     def setUp(self):
         self.c = Client()
-        self.login_data = {'username':'username',
-                           'password':'password'}
+        self.login_data = {'username': 'username',
+                           'password': 'password'}
         User.objects.create_user(**self.login_data)
 
     def test_valid_logout(self):
@@ -17,7 +17,7 @@ class TestLogout(TestCase):
 
     def test_custom_logout_redirect(self):
         self.assertTrue(self.c.login(**self.login_data))
-        r = self.c.post('/logout/', data={'current_page':'/login/'}, follow=True)
+        r = self.c.post('/logout/', data={'current_page': '/login/'}, follow=True)
         self.assertRedirects(r, '/login/')
         self.assertContains(r, 'Logged out!')
 

@@ -35,10 +35,10 @@ class TestLoginPOST(TestCase):
         self.assertContains(r, 'You are already logged in.')
 
     def test_login_redirect(self):
-        redirect_data = {'username':self.valid_data['username'],
-                         'password':self.valid_data['password'],
-                         'next':'/submit/'}
-        r = self.c.post('/login/', data = redirect_data)
+        redirect_data = {'username': self.valid_data['username'],
+                         'password': self.valid_data['password'],
+                         'next': '/submit/'}
+        r = self.c.post('/login/', data=redirect_data)
         self.assertRedirects(r, '/submit/')
 
     def test_malformed_request(self):
