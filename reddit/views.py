@@ -149,8 +149,13 @@ def user_login(request):
         return render(request, 'public/login.html')
 
     if request.method == "POST":
-        user = authenticate(username=request.POST['username'],
-                            password=request.POST['password'])
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        if not username or not password:
+            return HttpResponseBadRequest()
+
+        user = authenticate(username=username,
+                            password=password)
 
         if user:
             if user.is_active:
