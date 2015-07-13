@@ -146,6 +146,7 @@ def user_login(request):
 
     if request.user.is_authenticated():
         messages.warning(request, "You are already logged in.")
+        return render(request, 'public/login.html')
 
     if request.method == "POST":
         user = authenticate(username=request.POST['username'],
