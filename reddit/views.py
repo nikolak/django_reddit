@@ -160,7 +160,7 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                redirect_url = request.POST.get('next') or 'reddit.views.frontpage'
+                redirect_url = request.POST.get('next', 'Frontpage')
                 return redirect(redirect_url)
             else:
                 return render(request, 'public/login.html',
@@ -179,10 +179,11 @@ def user_logout(request):
     """
 
     if request.user.is_authenticated():
+        redirect_page = request.POST.get('current_page', '/')
         logout(request)
         messages.success(request, 'Logged out!')
-        return redirect('reddit.views.frontpage')
-    return redirect('reddit.views.frontpage')
+        return redirect(redirect_page)
+    return redirect('Frontpage')
 
 
 def register(request):
