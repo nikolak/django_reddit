@@ -1,6 +1,8 @@
 #Django reddit
 Reddit clone written in python using django web framework and twitter's bootstrap.
 
+[![Build Status](https://travis-ci.org/Nikola-K/django_reddit.svg)](https://travis-ci.org/Nikola-K/django_reddit) [![Coverage Status](https://coveralls.io/repos/Nikola-K/django_reddit/badge.svg?branch=master&service=github)](https://coveralls.io/github/Nikola-K/django_reddit?branch=master)
+
 #Screenshots
 
 ![desktop_frontpage](_screenshots/desktop_frontpage 2015-06-22.jpg?raw=true)
