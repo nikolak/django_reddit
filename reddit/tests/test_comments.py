@@ -81,3 +81,7 @@ class TestViewingThreadComments(TestCase):
         self.assertEqual(r.context['comment_votes'], {1:1, 5:-1})
         self.assertContains(r, 'root comment', count=3)
         self.assertContains(r, 'reply comment', count=2)
+
+    def test_invalid_thread_id(self):
+        r = self.c.get(reverse('Thread', args=(123,)))
+        self.assertEqual(r.status_code, 404)
