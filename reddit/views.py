@@ -37,11 +37,11 @@ def frontpage(request):
     all_submissions = Submission.objects.order_by('-score').all()
     paginator = Paginator(all_submissions, 25)
 
-    page = request.GET.get('page')
+    page = request.GET.get('page', 1)
     try:
         submissions = paginator.page(page)
     except PageNotAnInteger:
-        submissions = paginator.page(1)
+        raise Http404
     except EmptyPage:
         submissions = paginator.page(paginator.num_pages)
 
@@ -133,7 +133,7 @@ def edit_profile(request):
             profile.save()
             messages.success(request, "Profile settings saved")
     else:
-        return Http404()
+        raise Http404
 
     return render(request, 'private/edit_profile.html', {'form': profile_form})
 
