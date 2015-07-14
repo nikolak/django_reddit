@@ -14,13 +14,14 @@ class RegistrationFormTestCase(TestCase):
         form = UserForm(data=test_data)
         self.assertTrue(form.is_valid())
 
-    def test_invalid_username(self):
+    def test_too_short_username(self):
         test_data = {'username': '_',
                      'password': 'password'}
         form = UserForm(data=test_data)
         self.assertEqual(form.errors['username'], [u"Ensure this value has at least 3 characters (it has 1)."])
         self.assertFalse(form.is_valid())
 
+    def test_too_long_username(self):
         test_data = {'username': '1234567890123',
                      'password': 'password'}
 
@@ -42,6 +43,16 @@ class RegistrationFormTestCase(TestCase):
         form = UserForm(data=test_data)
         self.assertEqual(form.errors['username'], [u"A user with that username already exists."])
         self.assertFalse(form.is_valid())
+
+    def test_missing_username(self):
+        test_data = {'password': 'password'}
+        form = UserForm(data=test_data)
+        self.assertEqual(form.errors['username'], [u"This field is required."])
+
+    def test_missing_password(self):
+        test_data = {'username': 'username'}
+        form = UserForm(data=test_data)
+        self.assertEqual(form.errors['password'], [u"This field is required."])
 
 
 class RegistrationPostTestCase(TestCase):
@@ -75,3 +86,7 @@ class RegistrationPostTestCase(TestCase):
         self.assertIsNone(User.objects.filter(username=test_data['username']).first(),
                           msg="Invalid user instance created")
         self.assertFalse(self.c.login(**test_data), msg="Invalid user data can be used to login")
+
+    def test_malformed_post_request(self):
+        response = self.c.post('/register/', data={'a': "a", 1: "b"})
+        self.assertContains(response, 'This field is required.', count=2)
