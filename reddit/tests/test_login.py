@@ -13,7 +13,7 @@ class TestLoginPOST(TestCase):
         User.objects.create_user(**self.valid_data)
 
     def test_valid_login(self):
-        r = self.c.post(reverse('Login'), data=self.valid_data)
+        r = self.c.post(reverse('Login'), data=self.valid_data, follow=True)
         self.assertRedirects(r, reverse('Frontpage'))
         self.assertTrue(self.c.login(**self.valid_data))
 
