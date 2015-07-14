@@ -86,16 +86,18 @@ def comments(request, thread_id=None):
         reddit_user = None
 
     sub_vote_value = None
-    try:
-        vote = Vote.objects.get(vote_object_type=this_submission.get_content_type(),
-                                vote_object_id=this_submission.id)
-        sub_vote_value = vote.value
-    except Vote.DoesNotExist:
-        pass
-
     comment_votes = {}
 
     if reddit_user:
+
+        try:
+            vote = Vote.objects.get(vote_object_type=this_submission.get_content_type(),
+                                    vote_object_id=this_submission.id,
+                                    user = reddit_user)
+            sub_vote_value = vote.value
+        except Vote.DoesNotExist:
+            pass
+
         try:
             user_thread_votes = Vote.objects.filter(user=reddit_user,
                                                     submission=this_submission)
@@ -160,7 +162,7 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request, user)
-                redirect_url = request.POST.get('next', 'Frontpage')
+                redirect_url = request.POST.get('next') or 'Frontpage'
                 return redirect(redirect_url)
             else:
                 return render(request, 'public/login.html',
