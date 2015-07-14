@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from reddit.forms import UserForm
 from django.contrib.auth.models import User
@@ -63,8 +64,8 @@ class RegistrationPostTestCase(TestCase):
         test_data = {'username': 'username',
                      'password': 'password'}
 
-        response = self.c.post('/register/', data=test_data)
-        self.assertRedirects(response, '/login/')
+        response = self.c.post(reverse('Register'), data=test_data)
+        self.assertRedirects(response, reverse('Login'))
 
         user = User.objects.filter(username=test_data['username']).first()
         self.assertIsNotNone(user,
@@ -75,12 +76,14 @@ class RegistrationPostTestCase(TestCase):
                              msg="User created but not assigned to RedditUser model")
 
         self.assertTrue(self.c.login(**test_data), msg="User is unable to login.")
+        self.assertEquals(RedditUser.objects.all().count(), 1)
+        self.assertEquals(User.objects.all().count(), 1)
 
     def test_invalid_data(self):
         test_data = {'username': 'invalid_too_long_username',
                      'password': '_'}
 
-        response = self.c.post('/register/', data=test_data)
+        response = self.c.post(reverse('Register'), data=test_data)
         self.assertEqual(response.status_code, 200,
                          msg="Form submission failed, but a registration page was not returned again")
         self.assertIsNone(User.objects.filter(username=test_data['username']).first(),
@@ -88,5 +91,5 @@ class RegistrationPostTestCase(TestCase):
         self.assertFalse(self.c.login(**test_data), msg="Invalid user data can be used to login")
 
     def test_malformed_post_request(self):
-        response = self.c.post('/register/', data={'a': "a", 1: "b"})
+        response = self.c.post(reverse('Register'), data={'a': "a", 1: "b"})
         self.assertContains(response, 'This field is required.', count=2)
