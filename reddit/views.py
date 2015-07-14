@@ -354,7 +354,7 @@ def submit(request):
 
 
 @csrf_exempt
-def test_data(request):
+def test_data(request): # pragma: no cover
     """
     Quick and dirty way to create 10 random submissions random comments each
     and up to 100 users with usernames (their passwords are same as usernames)
