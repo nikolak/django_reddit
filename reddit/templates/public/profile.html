@@ -74,7 +74,8 @@
                                 <a type="button" class="btn btn-primary" href="/profile/edit"><span
                                         class="fa fa-gear"></span> Edit</a>
                             {% else %}
-                                <a class="btn btn-success"><span class="fa fa-envelope-o"></span> Message </a>
+                                <a class="btn btn-success" href="/messages/compose?to={{ profile.user.username }}">
+                                    <span class="fa fa-envelope-o"></span> Message </a>
                             {% endif %}
                         </div>
                     </div>
