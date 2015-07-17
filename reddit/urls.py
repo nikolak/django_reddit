@@ -25,7 +25,7 @@ urlpatterns = [
     url(r'^register/$', views.register, name="Register"),
     url(r'^submit/$', views.submit, name="Submit"),
     url(r'^user/(?P<username>\w+)$', views.user_profile, name="User Profile"),
-    url(r'^profile/edit/$', views.edit_profile, name="Edit profile"),
+    url(r'^profile/edit/$', views.edit_profile, name="Edit Profile"),
 
     url(r'^post/comment/$', views.post_comment, name="Post Comment"),
     url(r'^vote/$', views.vote, name="Vote on item"),
