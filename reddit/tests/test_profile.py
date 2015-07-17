@@ -42,34 +42,37 @@ class TestProfileViewing(TestCase):
         r = self.c.get(reverse('User Profile', args=('none',)))
         self.assertEqual(r.status_code, 404)
 
+
 class TestProfileEditingForm(TestCase):
+    def setUp(self):
+        self.valid_data = {
+            'first_name': 'first_name',
+            'last_name': 'last_name',
+            'email': 'email@example.com',
+            'display_picture': False,
+            'about_text': 'about_text',
+            'homepage': 'http://example.com',
+            'github': 'username',
+            'twitter': 'username',
+        }
+
+        self.invalid_data = {
+            'first_name': 'too_long_first_name',
+            'last_name': 'too_long_last_name',
+            'email': 'notanemail',
+            'display_picture': False,
+            'about_text': 'toolong' * 75,
+            'homepage': 'notadomain',
+            'github': 'toolong' * 10,
+            'twitter': 'toolong' * 5,
+        }
 
     def test_all_valid_data(self):
-        test_data = {
-            'first_name':'first_name',
-            'last_name':'last_name',
-            'email':'email@example.com',
-            'display_picture':False,
-            'about_text':'about_text',
-            'homepage':'http://example.com',
-            'github':'username',
-            'twitter':'username',
-        }
-        form = ProfileForm(data=test_data)
+        form = ProfileForm(data=self.valid_data)
         self.assertTrue(form.is_valid())
 
     def test_invalid_data(self):
-        test_data = {
-            'first_name':'too_long_first_name',
-            'last_name':'too_long_last_name',
-            'email':'notanemail',
-            'display_picture':False,
-            'about_text':'toolong'*75,
-            'homepage':'notadomain',
-            'github':'toolong'*10,
-            'twitter':'toolong'*5,
-        }
-        form = ProfileForm(data=test_data)
+        form = ProfileForm(data=self.invalid_data)
         self.assertEqual(form.errors['first_name'], [u"Ensure this value has at most 12 characters (it has 19)."])
         self.assertEqual(form.errors['last_name'], [u"Ensure this value has at most 12 characters (it has 18)."])
         self.assertEqual(form.errors['email'], [u"Enter a valid email address."])
@@ -81,14 +84,65 @@ class TestProfileEditingForm(TestCase):
 
     def test_empty_data(self):
         test_data = {
-            'first_name':'',
-            'last_name':'',
-            'email':'',
-            'display_picture':False,
-            'about_text':'',
-            'homepage':'',
-            'github':'',
-            'twitter':'',
+            'first_name': '',
+            'last_name': '',
+            'email': '',
+            'display_picture': False,
+            'about_text': '',
+            'homepage': '',
+            'github': '',
+            'twitter': '',
         }
         form = ProfileForm(data=test_data)
         self.assertTrue(form.is_valid())
+
+
+class TestProfilePageRequests(TestCase):
+    def setUp(self):
+        self.c = Client()
+        RedditUser.objects.create(
+            user=User.objects.create_user(username='profiletest',
+                                          password='password')
+        )
+        self.valid_data = {
+            'first_name': 'first_name',
+            'last_name': 'last_name',
+            'email': 'email@example.com',
+            'display_picture': True,
+            'about_text': 'about_text',
+            'homepage': 'http://example.com',
+            'github': 'username',
+            'twitter': 'username',
+        }
+
+    def test_not_logged_in(self):
+        r = self.c.get(reverse('Edit Profile'))
+        self.assertRedirects(r, reverse('Login') + '?next=' + reverse('Edit Profile'))
+
+    def test_invalid_request(self):
+        self.c.login(username='profiletest',
+                     password='password')
+        r = self.c.delete(reverse('Edit Profile'))
+        self.assertEqual(r.status_code, 404)
+
+    def test_form_view(self):
+        self.c.login(username='profiletest',
+                     password='password')
+        r = self.c.get(reverse('Edit Profile'))
+        self.assertIsInstance(r.context['form'], ProfileForm)
+
+    def test_form_submit(self):
+        self.c.login(username='profiletest',
+                     password='password')
+
+        r = self.c.post(reverse('Edit Profile'), data=self.valid_data)
+        self.assertEqual(r.status_code, 200)
+
+        user = RedditUser.objects.get(user=User.objects.get(
+            username='profiletest'
+        ))
+        for name, value in self.valid_data.items():
+            self.assertEqual(getattr(user, name), value)
+
+        self.assertEqual(user.gravatar_hash, '5658ffccee7f0ebfda2b226238b1eb6e')
+        self.assertEqual(user.about_html, u'<p>about_text</p>\n')
