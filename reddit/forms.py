@@ -97,7 +97,7 @@ class SubmissionForm(forms.ModelForm):
     title = forms.CharField(widget=forms.TextInput(
         attrs={'class': "form-control",
                'placeholder': "Submission title"}),
-        required=True, min_length=1)
+        required=True, min_length=1, max_length=250)
 
     url = forms.URLField(widget=forms.URLInput(
         attrs={'class': "form-control",
