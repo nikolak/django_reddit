@@ -1,15 +1,17 @@
+import json
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from reddit.models import RedditUser, Submission, Comment, Vote
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
+from django.http import HttpResponseNotAllowed, HttpResponseBadRequest
 
 
 class TestViewingThreadComments(TestCase):
     def setUp(self):
         self.c = Client()
-        self.credentials = {'username':'username',
-                            'password':'password'}
+        self.credentials = {'username': 'username',
+                            'password': 'password'}
         author = RedditUser.objects.create(
             user=User.objects.create_user(**self.credentials)
         )
@@ -78,10 +80,135 @@ class TestViewingThreadComments(TestCase):
         r = self.c.get(reverse('Thread', args=(1,)))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context['sub_vote'], 1)
-        self.assertEqual(r.context['comment_votes'], {1:1, 5:-1})
+        self.assertEqual(r.context['comment_votes'], {1: 1, 5: -1})
         self.assertContains(r, 'root comment', count=3)
         self.assertContains(r, 'reply comment', count=2)
 
     def test_invalid_thread_id(self):
         r = self.c.get(reverse('Thread', args=(123,)))
         self.assertEqual(r.status_code, 404)
+
+
+class TestPostingComment(TestCase):
+    def setUp(self):
+        self.c = Client()
+        self.credentials = {'username': 'commentposttest',
+                            'password': 'password'}
+        author = RedditUser.objects.create(
+            user=User.objects.create_user(**self.credentials)
+        )
+
+        Submission.objects.create(
+            id=99,
+            score=1,
+            title=get_random_string(length=12),
+            author=author
+        )
+
+    def test_post_only(self):
+        r = self.c.get(reverse('Post Comment'))
+        self.assertIsInstance(r, HttpResponseNotAllowed)
+
+    def test_logged_out(self):
+        r = self.c.post(reverse('Post Comment'))
+        self.assertEqual(r.status_code, 200)
+        json_response = json.loads(r.content)
+        self.assertEqual(json_response['msg'], "You need to log in to post new comments.")
+
+    def test_missing_type_or_id(self):
+        self.c.login(**self.credentials)
+        for key in ['parentType', 'parentId']:
+            r = self.c.post(reverse('Post Comment'),
+                            data={key: 'comment'})
+            self.assertIsInstance(r, HttpResponseBadRequest)
+        r = self.c.post(reverse('Post Comment'),
+                        data={'parentType': 'InvalidType',
+                              'parentId': 1})
+        self.assertIsInstance(r, HttpResponseBadRequest)
+
+    def test_no_comment_text(self):
+        self.c.login(**self.credentials)
+        test_data = {
+            'parentType': 'submission',
+            'parentId': 1,
+            'commentContent': ''
+        }
+        r = self.c.post(reverse('Post Comment'), data=test_data)
+        self.assertEqual(r.status_code, 200)
+        json_response = json.loads(r.content)
+        self.assertEqual(json_response['msg'],
+                         'You have to write something.')
+
+    def test_invalid_or_wrong_parent_id(self):
+        self.c.login(**self.credentials)
+        test_data = {
+            'parentType': 'submission',
+            'parentId': 'invalid',
+            'commentContent': 'content'
+        }
+        r = self.c.post(reverse('Post Comment'), data=test_data)
+        self.assertIsInstance(r, HttpResponseBadRequest)
+
+        test_data = {
+            'parentType': 'submission',
+            'parentId': 9999,
+            'commentContent': 'content'
+        }
+
+        r = self.c.post(reverse('Post Comment'), data=test_data)
+        self.assertIsInstance(r, HttpResponseBadRequest)
+
+        test_data = {
+            'parentType': 'comment',
+            'parentId': 9999,
+            'commentContent': 'content'
+        }
+
+        r = self.c.post(reverse('Post Comment'), data=test_data)
+        self.assertIsInstance(r, HttpResponseBadRequest)
+
+    def test_valid_comment_posting_thread(self):
+        self.c.login(**self.credentials)
+        test_data = {
+            'parentType': 'submission',
+            'parentId': 99,
+            'commentContent': 'thread root comment'
+        }
+
+        r = self.c.post(reverse('Post Comment'), data=test_data)
+        self.assertEqual(r.status_code, 200)
+        json_r = json.loads(r.content)
+        self.assertEqual(json_r['msg'], 'Your comment has been posted.')
+        all_comments = Comment.objects.filter(
+            submission=Submission.objects.get(id=99)
+        )
+        self.assertEqual(all_comments.count(), 1)
+        comment = all_comments.first()
+        self.assertEqual(comment.html_comment, u'<p>thread root comment</p>\n')
+        self.assertEqual(comment.author.user.username, self.credentials['username'])
+
+    def test_valid_comment_posting_reply(self):
+        self.c.login(**self.credentials)
+        thread = Submission.objects.get(id=99)
+        author = RedditUser.objects.get(user=User.objects.get(
+            username=self.credentials['username']
+        ))
+        comment = Comment.create(author, 'root comment', thread)
+        comment.save()
+        self.assertEqual(Comment.objects.filter(submission=thread).count(), 1)
+
+        test_data = {
+            'parentType': 'comment',
+            'parentId': comment.id,
+            'commentContent': 'thread reply comment'
+        }
+
+        r = self.c.post(reverse('Post Comment'), data=test_data)
+        self.assertEqual(r.status_code, 200)
+        json_r = json.loads(r.content)
+        self.assertEqual(json_r['msg'], 'Your comment has been posted.')
+        self.assertEqual(Comment.objects.filter(submission=thread).count(), 2)
+
+        comment = Comment.objects.filter(submission=thread,
+                                         id=2).first()
+        self.assertEqual(comment.html_comment, u'<p>thread reply comment</p>\n')
