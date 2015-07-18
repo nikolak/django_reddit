@@ -231,6 +231,7 @@ def post_comment(request):
     if not raw_comment:
         return JsonResponse({'msg': "You have to write something."})
     author = RedditUser.objects.get(user=request.user)
+    parent_object = None
     try:  # try and get comment or submission we're voting on
         if parent_type == 'comment':
             parent_object = Comment.objects.get(id=parent_id)
