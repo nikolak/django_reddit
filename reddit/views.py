@@ -224,7 +224,8 @@ def post_comment(request):
     raw_comment = request.POST.get('commentContent', None)
 
     if not all([parent_id, parent_type]) or \
-                    parent_type not in ['comment', 'submission']:
+                    parent_type not in ['comment', 'submission'] or \
+            not parent_id.isdigit():
         return HttpResponseBadRequest()
 
     if not raw_comment:
@@ -235,8 +236,6 @@ def post_comment(request):
             parent_object = Comment.objects.get(id=parent_id)
         elif parent_type == 'submission':
             parent_object = Submission.objects.get(id=parent_id)
-        else:
-            return HttpResponseBadRequest()
 
     except (Comment.DoesNotExist, Submission.DoesNotExist):
         return HttpResponseBadRequest()
