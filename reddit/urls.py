@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'^profile/edit/$', views.edit_profile, name="Edit Profile"),
 
     url(r'^post/comment/$', views.post_comment, name="Post Comment"),
-    url(r'^vote/$', views.vote, name="Vote on item"),
+    url(r'^vote/$', views.vote, name="Vote"),
 
 
     url(r'^populate/$', views.test_data, name="Create test data"),
