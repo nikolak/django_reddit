@@ -277,7 +277,7 @@ def vote(request):
         if new_vote_value not in [-1, 1]:
             raise ValueError("Wrong value for the vote!")
 
-    except ValueError:
+    except (ValueError, TypeError):
         return HttpResponseBadRequest()
 
     # if one of the objects is None, 0 or some other bool(value) == False value
@@ -297,7 +297,7 @@ def vote(request):
             return HttpResponseBadRequest()  # should never happen
 
     except (Comment.DoesNotExist, Submission.DoesNotExist):
-        return HttpResponseBadRequest
+        return HttpResponseBadRequest()
 
     # Try and get the existing vote for this object, if it exists.
     try:
