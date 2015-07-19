@@ -235,7 +235,6 @@ class Vote(models.Model):
         self.vote_object.save()
         self.vote_object.author.save()
         self.save()
-        print self.vote_object.author.link_karma
 
         return vote_diff
 
