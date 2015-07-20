@@ -19,7 +19,8 @@ class RegistrationFormTestCase(TestCase):
         test_data = {'username': '_',
                      'password': 'password'}
         form = UserForm(data=test_data)
-        self.assertEqual(form.errors['username'], [u"Ensure this value has at least 3 characters (it has 1)."])
+        self.assertEqual(form.errors['username'], [
+            u"Ensure this value has at least 3 characters (it has 1)."])
         self.assertFalse(form.is_valid())
 
     def test_too_long_username(self):
@@ -27,14 +28,24 @@ class RegistrationFormTestCase(TestCase):
                      'password': 'password'}
 
         form = UserForm(data=test_data)
-        self.assertEqual(form.errors['username'], [u"Ensure this value has at most 12 characters (it has 13)."])
+        self.assertEqual(form.errors['username'], [
+            u"Ensure this value has at most 12 characters (it has 13)."])
         self.assertFalse(form.is_valid())
+
+    def test_invalid_username(self):
+        test_data = {'username': 'matt-ex',
+                     'password': 'password'}
+        form = UserForm(data=test_data)
+        self.assertEqual(form.errors['username'],
+                         [u"This value may contain only letters, "
+                          u"numbers and _ characters."])
 
     def test_invalid_password(self):
         test_data = {'username': 'username',
                      'password': '_'}
         form = UserForm(data=test_data)
-        self.assertEqual(form.errors['password'], [u"Ensure this value has at least 4 characters (it has 1)."])
+        self.assertEqual(form.errors['password'], [
+            u"Ensure this value has at least 4 characters (it has 1)."])
         self.assertFalse(form.is_valid())
 
     def test_existing_username(self):
@@ -42,7 +53,8 @@ class RegistrationFormTestCase(TestCase):
                      'password': 'password'}
 
         form = UserForm(data=test_data)
-        self.assertEqual(form.errors['username'], [u"A user with that username already exists."])
+        self.assertEqual(form.errors['username'],
+                         [u"A user with that username already exists."])
         self.assertFalse(form.is_valid())
 
     def test_missing_username(self):
@@ -60,12 +72,19 @@ class RegistrationPostTestCase(TestCase):
     def setUp(self):
         self.c = Client()
 
+    def test_logged_in(self):
+        User.objects.create_user(username='regtest', password='password')
+        self.c.login(username='regtest', password='password')
+        r = self.c.get(reverse('Register'))
+        self.assertContains(r, 'You are already registered and logged in.')
+        self.assertContains(r, 'type="submit" disabled')
+
     def test_valid_data(self):
         test_data = {'username': 'username',
                      'password': 'password'}
 
         response = self.c.post(reverse('Register'), data=test_data)
-        self.assertRedirects(response, reverse('Login'))
+        self.assertRedirects(response, reverse('Frontpage'))
 
         user = User.objects.filter(username=test_data['username']).first()
         self.assertIsNotNone(user,
@@ -75,7 +94,8 @@ class RegistrationPostTestCase(TestCase):
         self.assertIsNotNone(redditUser,
                              msg="User created but not assigned to RedditUser model")
 
-        self.assertTrue(self.c.login(**test_data), msg="User is unable to login.")
+        self.assertTrue(self.c.login(**test_data),
+                        msg="User is unable to login.")
         self.assertEquals(RedditUser.objects.all().count(), 1)
         self.assertEquals(User.objects.all().count(), 1)
 
@@ -86,9 +106,11 @@ class RegistrationPostTestCase(TestCase):
         response = self.c.post(reverse('Register'), data=test_data)
         self.assertEqual(response.status_code, 200,
                          msg="Form submission failed, but a registration page was not returned again")
-        self.assertIsNone(User.objects.filter(username=test_data['username']).first(),
-                          msg="Invalid user instance created")
-        self.assertFalse(self.c.login(**test_data), msg="Invalid user data can be used to login")
+        self.assertIsNone(
+            User.objects.filter(username=test_data['username']).first(),
+            msg="Invalid user instance created")
+        self.assertFalse(self.c.login(**test_data),
+                         msg="Invalid user data can be used to login")
 
     def test_malformed_post_request(self):
         response = self.c.post(reverse('Register'), data={'a': "a", 1: "b"})
