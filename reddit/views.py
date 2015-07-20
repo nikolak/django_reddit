@@ -3,7 +3,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from django.template.defaulttags import register
-from django.http import JsonResponse, HttpResponseBadRequest, Http404, HttpResponseForbidden, HttpResponse
+from django.http import JsonResponse, HttpResponseBadRequest, Http404, \
+    HttpResponseForbidden, HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.models import User
@@ -15,7 +16,7 @@ from reddit.utils.helpers import post_only, get_only
 
 
 @register.filter
-def get_item(dictionary, key): # pragma: no cover
+def get_item(dictionary, key):  # pragma: no cover
     """
     Needed because there's no built in .get in django templates
     when working with dictionaries.
@@ -50,9 +51,10 @@ def frontpage(request):
     if request.user.is_authenticated():
         for submission in submissions:
             try:
-                vote = Vote.objects.get(vote_object_type=submission.get_content_type(),
-                                        vote_object_id=submission.id,
-                                        user=RedditUser.objects.get(user=request.user))
+                vote = Vote.objects.get(
+                    vote_object_type=submission.get_content_type(),
+                    vote_object_id=submission.id,
+                    user=RedditUser.objects.get(user=request.user))
                 submission_votes[submission.id] = vote.value
             except Vote.DoesNotExist:
                 pass
@@ -91,9 +93,10 @@ def comments(request, thread_id=None):
     if reddit_user:
 
         try:
-            vote = Vote.objects.get(vote_object_type=this_submission.get_content_type(),
-                                    vote_object_id=this_submission.id,
-                                    user = reddit_user)
+            vote = Vote.objects.get(
+                vote_object_type=this_submission.get_content_type(),
+                vote_object_id=this_submission.id,
+                user=reddit_user)
             sub_vote_value = vote.value
         except Vote.DoesNotExist:
             pass
@@ -107,10 +110,11 @@ def comments(request, thread_id=None):
         except:
             pass
 
-    return render(request, 'public/comments.html', {'submission': this_submission,
-                                                    'comments': thread_comments,
-                                                    'comment_votes': comment_votes,
-                                                    'sub_vote': sub_vote_value})
+    return render(request, 'public/comments.html',
+                  {'submission': this_submission,
+                   'comments': thread_comments,
+                   'comment_votes': comment_votes,
+                   'sub_vote': sub_vote_value})
 
 
 def user_profile(request, username):
@@ -197,6 +201,10 @@ def register(request):
     If account has been created user is redirected to login page.
     """
     user_form = UserForm()
+    if request.user.is_authenticated():
+        messages.warning(request,
+                        'You are already registered and logged in.')
+        return render(request, 'public/register.html', {'form': user_form})
 
     if request.method == "POST":
         user_form = UserForm(request.POST)
@@ -208,8 +216,10 @@ def register(request):
             reddit_user = RedditUser()
             reddit_user.user = user
             reddit_user.save()
-            messages.success(request, 'You have successfully registered! You can log in now')
-            return redirect('Login')
+            user = authenticate(username=request.POST['username'],
+                                password=request.POST['password'])
+            login(request, user)
+            return redirect('Frontpage')
 
     return render(request, 'public/register.html', {'form': user_form})
 
@@ -321,12 +331,14 @@ def vote(request):
         # canceling vote
         vote_diff = vote.cancel_vote()
         if not vote_diff:
-            return HttpResponseBadRequest('Something went wrong while canceling the vote')
+            return HttpResponseBadRequest(
+                'Something went wrong while canceling the vote')
     else:
         # changing vote
         vote_diff = vote.change_vote(new_vote_value)
         if not vote_diff:
-            return HttpResponseBadRequest('Wrong values for old/new vote combination')
+            return HttpResponseBadRequest(
+                'Wrong values for old/new vote combination')
 
     return JsonResponse({'error': None,
                          'voteDiff': vote_diff})
@@ -356,7 +368,7 @@ def submit(request):
 
 
 @csrf_exempt
-def test_data(request): # pragma: no cover
+def test_data(request):  # pragma: no cover
     """
     Quick and dirty way to create 10 random submissions random comments each
     and up to 100 users with usernames (their passwords are same as usernames)
@@ -395,7 +407,8 @@ def test_data(request): # pragma: no cover
 
         for _ in range(0, randint(min_words, max_words)):
             sentence += ''.join(choice(letters)
-                                for i in range(randint(min_word_len, max_word_len)))
+                                for i in
+                                range(randint(min_word_len, max_word_len)))
             sentence += ' '
 
         return sentence
