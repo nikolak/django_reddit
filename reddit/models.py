@@ -43,22 +43,28 @@ class MttpContentTypeAware(MPTTModel):
 
 class RedditUser(models.Model):
     user = models.OneToOneField(User)
-    first_name = models.CharField(max_length=35,null=True, default=None, blank=True)
-    last_name = models.CharField(max_length=35, null=True, default=None, blank=True)
+    first_name = models.CharField(max_length=35, null=True, default=None,
+                                  blank=True)
+    last_name = models.CharField(max_length=35, null=True, default=None,
+                                 blank=True)
     email = models.EmailField(null=True, blank=True, default=None)
-    about_text = models.TextField(blank=True,null=True, max_length=500, default=None)
-    about_html = models.TextField(blank=True,null=True,default=None)
-    gravatar_hash = models.CharField(max_length=32,null=True,blank=True, default=None)
+    about_text = models.TextField(blank=True, null=True, max_length=500,
+                                  default=None)
+    about_html = models.TextField(blank=True, null=True, default=None)
+    gravatar_hash = models.CharField(max_length=32, null=True, blank=True,
+                                     default=None)
     display_picture = models.NullBooleanField(default=False)
     homepage = models.URLField(null=True, blank=True, default=None)
-    twitter = models.CharField(null=True,blank=True, max_length=15, default=None)
-    github = models.CharField(null=True, blank=True, max_length=39, default=None)
+    twitter = models.CharField(null=True, blank=True, max_length=15,
+                               default=None)
+    github = models.CharField(null=True, blank=True, max_length=39,
+                              default=None)
 
     comment_karma = models.IntegerField(default=0)
     link_karma = models.IntegerField(default=0)
 
     def update_profile_data(self):
-        self.about_html=mistune.markdown(self.about_text)
+        self.about_html = mistune.markdown(self.about_text)
         if self.display_picture:
             self.gravatar_hash = md5(self.email.lower()).hexdigest()
 
@@ -103,7 +109,8 @@ class Comment(MttpContentTypeAware):
     author_name = models.CharField(null=False, max_length=12)
     author = models.ForeignKey(RedditUser)
     submission = models.ForeignKey(Submission)
-    parent = TreeForeignKey('self', related_name='children', null=True, db_index=True)
+    parent = TreeForeignKey('self', related_name='children',
+                            null=True, blank=True, db_index=True)
     timestamp = models.DateTimeField(default=timezone.now)
     ups = models.IntegerField(default=0)
     downs = models.IntegerField(default=0)
@@ -130,9 +137,10 @@ class Comment(MttpContentTypeAware):
         :rtype: Comment
         """
 
-        html_comment = mistune.markdown(raw_comment)  # todo: any exceptions possible?
+        html_comment = mistune.markdown(raw_comment)
+        # todo: any exceptions possible?
         comment = cls(author=author,
-                      author_name = author.user.username,
+                      author_name=author.user.username,
                       raw_comment=raw_comment,
                       html_comment=html_comment)
 
@@ -181,7 +189,7 @@ class Vote(models.Model):
 
         if isinstance(vote_object, Submission):
             submission = vote_object
-            vote_object.author.link_karma+=vote_value
+            vote_object.author.link_karma += vote_value
         else:
             submission = vote_object.submission
             vote_object.author.comment_karma += vote_value
@@ -227,7 +235,7 @@ class Vote(models.Model):
             return None
 
         if isinstance(self.vote_object, Submission):
-            self.vote_object.author.link_karma+=vote_diff
+            self.vote_object.author.link_karma += vote_diff
         else:
             self.vote_object.author.comment_karma += vote_diff
 
@@ -251,7 +259,7 @@ class Vote(models.Model):
             return None
 
         if isinstance(self.vote_object, Submission):
-            self.vote_object.author.link_karma+=vote_diff
+            self.vote_object.author.link_karma += vote_diff
         else:
             self.vote_object.author.comment_karma += vote_diff
 
