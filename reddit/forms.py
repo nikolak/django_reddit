@@ -1,10 +1,14 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 
 from reddit.models import Submission, RedditUser
 
 
 class UserForm(forms.ModelForm):
+    alphanumeric = RegexValidator(r'^[0-9a-zA-Z_]*$',
+                                  'This value may contain only letters, '
+                                  'numbers and _ characters.')
     username = forms.CharField(widget=forms.TextInput(
         attrs=
         {'class': "form-control",
@@ -13,7 +17,8 @@ class UserForm(forms.ModelForm):
          'autofocus': ''}),
         max_length=12,
         min_length=3,
-        required=True)
+        required=True,
+        validators=[alphanumeric])
     password = forms.CharField(widget=forms.PasswordInput(
         attrs=
         {'class': "form-control",
