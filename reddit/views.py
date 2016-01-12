@@ -393,7 +393,7 @@ def test_data(request):  # pragma: no cover
     root_comments = int(request.POST.get('comments', 10))
 
     from random import choice, randint
-    from string import letters
+    from string import ascii_letters as letters
 
     def get_random_username(length=6):
         return ''.join(choice(letters) for _ in range(length))
