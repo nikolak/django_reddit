@@ -112,7 +112,7 @@ class TestPostingComment(TestCase):
     def test_logged_out(self):
         r = self.c.post(reverse('Post Comment'))
         self.assertEqual(r.status_code, 200)
-        json_response = json.loads(r.content.decode("utf-8").decode("utf-8"))
+        json_response = json.loads(r.content.decode("utf-8"))
         self.assertEqual(json_response['msg'], "You need to log in to post new comments.")
 
     def test_missing_type_or_id(self):
