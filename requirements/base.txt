@@ -1,0 +1,6 @@
+Django==1.9.1
+django-environ==0.4.0
+django-secure==1.0.1
+django-widget-tweaks==1.4.1
+django-mptt==0.8.0
+mistune==0.7.1
