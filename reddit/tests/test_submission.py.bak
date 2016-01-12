@@ -29,9 +29,9 @@ class TestSubmissionForm(TestCase):
             'text': '.' * 5001
         }
         form = SubmissionForm(data=test_data)
-        self.assertEqual(form.errors['title'], ["Ensure this value has at most 250 characters (it has 300)."])
-        self.assertEqual(form.errors['url'], ["Enter a valid URL."])
-        self.assertEqual(form.errors['text'], ["Ensure this value has at most 5000 characters (it has 5001)."])
+        self.assertEqual(form.errors['title'], [u"Ensure this value has at most 250 characters (it has 300)."])
+        self.assertEqual(form.errors['url'], [u"Enter a valid URL."])
+        self.assertEqual(form.errors['text'], [u"Ensure this value has at most 5000 characters (it has 5001)."])
         self.assertFalse(form.is_valid())
 
 

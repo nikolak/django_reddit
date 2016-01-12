@@ -112,7 +112,7 @@ class TestPostingComment(TestCase):
     def test_logged_out(self):
         r = self.c.post(reverse('Post Comment'))
         self.assertEqual(r.status_code, 200)
-        json_response = json.loads(r.content.decode("utf-8").decode("utf-8"))
+        json_response = json.loads(r.content.decode("utf-8"))
         self.assertEqual(json_response['msg'], "You need to log in to post new comments.")
 
     def test_missing_type_or_id(self):
@@ -184,7 +184,7 @@ class TestPostingComment(TestCase):
         )
         self.assertEqual(all_comments.count(), 1)
         comment = all_comments.first()
-        self.assertEqual(comment.html_comment, '<p>thread root comment</p>\n')
+        self.assertEqual(comment.html_comment, u'<p>thread root comment</p>\n')
         self.assertEqual(comment.author.user.username, self.credentials['username'])
 
     def test_valid_comment_posting_reply(self):
@@ -211,4 +211,4 @@ class TestPostingComment(TestCase):
 
         comment = Comment.objects.filter(submission=thread,
                                          id=2).first()
-        self.assertEqual(comment.html_comment, '<p>thread reply comment</p>\n')
+        self.assertEqual(comment.html_comment, u'<p>thread reply comment</p>\n')

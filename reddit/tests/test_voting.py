@@ -100,7 +100,7 @@ class TestVotingOnItems(TestCase):
                             'vote_value': '1'
                         })
         self.assertEqual(r.status_code, 200)
-        json_r = json.loads(r.content)
+        json_r = json.loads(r.content.decode("utf-8"))
         self.assertIsNone(json_r['error'])
         self.assertEqual(json_r['voteDiff'], 1)
         submission = Submission.objects.filter(title="vote testing").first()
@@ -122,7 +122,7 @@ class TestVotingOnItems(TestCase):
                             'vote_value': '1'
                         })
         self.assertEqual(r.status_code, 200)
-        json_r = json.loads(r.content)
+        json_r = json.loads(r.content.decode("utf-8"))
         self.assertIsNone(json_r['error'])
         self.assertEqual(json_r['voteDiff'], -1)
 
@@ -140,7 +140,7 @@ class TestVotingOnItems(TestCase):
                             'vote_value': '-1'
                         })
         self.assertEqual(r.status_code, 200)
-        json_r = json.loads(r.content)
+        json_r = json.loads(r.content.decode("utf-8"))
         self.assertIsNone(json_r['error'])
         self.assertEqual(json_r['voteDiff'], -2)
 
@@ -157,7 +157,7 @@ class TestVotingOnItems(TestCase):
                             'vote_value': '1'
                         })
         self.assertEqual(r.status_code, 200)
-        json_r = json.loads(r.content)
+        json_r = json.loads(r.content.decode("utf-8"))
         self.assertIsNone(json_r['error'])
         self.assertEqual(json_r['voteDiff'], 1)
         scomment = Comment.objects.filter(submission=submission).first()
@@ -181,7 +181,7 @@ class TestVotingOnItems(TestCase):
                             'vote_value': '1'
                         })
         self.assertEqual(r.status_code, 200)
-        json_r = json.loads(r.content)
+        json_r = json.loads(r.content.decode("utf-8"))
         self.assertIsNone(json_r['error'])
         self.assertEqual(json_r['voteDiff'], -1)
 
@@ -199,6 +199,6 @@ class TestVotingOnItems(TestCase):
                             'vote_value': '-1'
                         })
         self.assertEqual(r.status_code, 200)
-        json_r = json.loads(r.content)
+        json_r = json.loads(r.content.decode("utf-8"))
         self.assertIsNone(json_r['error'])
         self.assertEqual(json_r['voteDiff'], -2)

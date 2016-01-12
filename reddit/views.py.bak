@@ -418,7 +418,7 @@ def test_data(request):  # pragma: no cover
             user = User.objects.get(username=username)
             author = RedditUser.objects.get(user=user)
         except (User.DoesNotExist, RedditUser.DoesNotExist):
-            print("Creating user {}".format(username))
+            print "Creating user {}".format(username)
             new_author = User(username=username)
             new_author.set_password(username)
             new_author.save()
@@ -427,7 +427,7 @@ def test_data(request):  # pragma: no cover
         return author
 
     def add_replies(root_comment, depth=1):
-        print("Adding comment replies...")
+        print "Adding comment replies..."
         if depth > 5:
             return
 
@@ -440,7 +440,7 @@ def test_data(request):  # pragma: no cover
             add_replies(new_comment, depth + 1)
 
     for _ in range(thread_count):
-        print("Creating new submission.")
+        print "Creating new submission."
         selftext = get_random_sentence()
         title = get_random_sentence(max_words=100, max_word_len=10)
         author = get_or_create_author(choice(random_usernames))

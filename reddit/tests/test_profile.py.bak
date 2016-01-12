@@ -73,13 +73,13 @@ class TestProfileEditingForm(TestCase):
 
     def test_invalid_data(self):
         form = ProfileForm(data=self.invalid_data)
-        self.assertEqual(form.errors['first_name'], ["Ensure this value has at most 12 characters (it has 19)."])
-        self.assertEqual(form.errors['last_name'], ["Ensure this value has at most 12 characters (it has 18)."])
-        self.assertEqual(form.errors['email'], ["Enter a valid email address."])
-        self.assertEqual(form.errors['about_text'], ["Ensure this value has at most 500 characters (it has 525)."])
-        self.assertEqual(form.errors['homepage'], ["Enter a valid URL."])
-        self.assertEqual(form.errors['github'], ["Ensure this value has at most 39 characters (it has 70)."])
-        self.assertEqual(form.errors['twitter'], ["Ensure this value has at most 15 characters (it has 35)."])
+        self.assertEqual(form.errors['first_name'], [u"Ensure this value has at most 12 characters (it has 19)."])
+        self.assertEqual(form.errors['last_name'], [u"Ensure this value has at most 12 characters (it has 18)."])
+        self.assertEqual(form.errors['email'], [u"Enter a valid email address."])
+        self.assertEqual(form.errors['about_text'], [u"Ensure this value has at most 500 characters (it has 525)."])
+        self.assertEqual(form.errors['homepage'], [u"Enter a valid URL."])
+        self.assertEqual(form.errors['github'], [u"Ensure this value has at most 39 characters (it has 70)."])
+        self.assertEqual(form.errors['twitter'], [u"Ensure this value has at most 15 characters (it has 35)."])
         self.assertFalse(form.is_valid())
 
     def test_empty_data(self):
@@ -141,8 +141,8 @@ class TestProfilePageRequests(TestCase):
         user = RedditUser.objects.get(user=User.objects.get(
             username='profiletest'
         ))
-        for name, value in list(self.valid_data.items()):
+        for name, value in self.valid_data.items():
             self.assertEqual(getattr(user, name), value)
 
         self.assertEqual(user.gravatar_hash, '5658ffccee7f0ebfda2b226238b1eb6e')
-        self.assertEqual(user.about_html, '<p>about_text</p>\n')
+        self.assertEqual(user.about_html, u'<p>about_text</p>\n')

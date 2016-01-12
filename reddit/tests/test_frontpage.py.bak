@@ -89,7 +89,7 @@ class TestFrontpageVotes(TestCase):
 
         upvote_keys = []
         downvote_keys = []
-        for post_id, vote_value in list(r.context['submission_votes'].items()):
+        for post_id, vote_value in r.context['submission_votes'].items():
             if vote_value == 1:
                 upvote_keys.append(post_id)
             elif vote_value == -1:
@@ -107,7 +107,7 @@ class TestFrontpageVotes(TestCase):
 
         upvote_keys = []
         downvote_keys = []
-        for post_id, vote_value in list(r.context['submission_votes'].items()):
+        for post_id, vote_value in r.context['submission_votes'].items():
             if vote_value == 1:
                 upvote_keys.append(post_id)
             elif vote_value == -1:
