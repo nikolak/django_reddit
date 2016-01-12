@@ -66,7 +66,7 @@ class RedditUser(models.Model):
     def update_profile_data(self):
         self.about_html = mistune.markdown(self.about_text)
         if self.display_picture:
-            self.gravatar_hash = md5(self.email.lower()).hexdigest()
+            self.gravatar_hash = md5(self.email.lower().encode('utf-8')).hexdigest()
 
     def __unicode__(self):
         return "<RedditUser:{}>".format(self.user.username)
