@@ -11,9 +11,9 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 
 from reddit.forms import UserForm, SubmissionForm, ProfileForm
-from reddit.models import RedditUser, Submission, Comment, Vote
+from reddit.models import Submission, Comment, Vote
 from reddit.utils.helpers import post_only, get_only
-
+from users.models import RedditUser
 
 @register.filter
 def get_item(dictionary, key):  # pragma: no cover

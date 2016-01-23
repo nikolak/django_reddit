@@ -2,8 +2,8 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from reddit.forms import SubmissionForm
-from reddit.models import RedditUser, Submission
-
+from reddit.models import Submission
+from users.models import RedditUser
 
 class TestSubmissionForm(TestCase):
     def test_full_valid_submission(self):

@@ -1,7 +1,8 @@
 import json
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-from reddit.models import RedditUser, Submission, Comment, Vote
+from reddit.models import Submission, Comment, Vote
+from users.models import RedditUser
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.http import HttpResponseNotAllowed, HttpResponseBadRequest

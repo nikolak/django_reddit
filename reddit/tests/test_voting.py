@@ -3,9 +3,9 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden, \
     HttpResponseBadRequest
 from django.test import Client, TestCase
-from reddit.models import RedditUser, Comment, Submission, Vote
+from reddit.models import Comment, Submission, Vote
 from django.contrib.auth.models import User
-
+from users.models import RedditUser
 
 class TestVotingOnItems(TestCase):
     def setUp(self):

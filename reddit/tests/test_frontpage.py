@@ -1,9 +1,9 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-from reddit.models import Submission, RedditUser, Vote
+from reddit.models import Submission, Vote
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
-
+from users.models import RedditUser
 
 class TestFrontPageGET(TestCase):
     def setUp(self):

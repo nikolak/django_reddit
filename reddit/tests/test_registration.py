@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from reddit.forms import UserForm
 from django.contrib.auth.models import User
-from reddit.models import RedditUser
+from users.models import RedditUser
 
 
 class RegistrationFormTestCase(TestCase):
