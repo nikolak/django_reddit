@@ -1,3 +1,6 @@
+from random import choice, randint
+from string import ascii_letters as letters
+
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
@@ -9,12 +12,13 @@ from users.models import RedditUser
 class Command(BaseCommand):
     help = 'Generates tests data'
 
-    def handle(self, *args, **options):
-        thread_count = 10
-        root_comments = 10
+    def add_arguments(self, parser):
+        parser.add_argument('--thread_count', type=int, default=10)
+        parser.add_argument('--root_comments', type=int, default=10)
 
-        from random import choice, randint
-        from string import ascii_letters as letters
+    def handle(self, *args, **options):
+        thread_count = options['thread_count']
+        root_comments = options['root_comments']
 
         def get_random_username(length=6):
             return ''.join(choice(letters) for _ in range(length))
@@ -90,4 +94,3 @@ class Command(BaseCommand):
                 while another_child:
                     add_replies(new_comment)
                     another_child = choice([True, False])
-
