@@ -1,1 +1,1 @@
-web: gunicorn {{project_name}}.wsgi:application
+web: gunicorn django_reddit.wsgi:application
