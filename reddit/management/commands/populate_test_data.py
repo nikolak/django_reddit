@@ -20,8 +20,8 @@ class Command(BaseCommand):
         self.thread_count = options['thread_count']
         self.root_comments = options['root_comments']
         self. random_usernames = [self.get_random_username() for _ in range(100)]
-        for _ in range(self.thread_count):
-            print("Creating new submission.")
+        for index, _ in enumerate(range(self.thread_count)):
+            print("Thread {} out of {}".format(str(index), self.thread_count))
             selftext = self.get_random_sentence()
             title = self.get_random_sentence(max_words=100, max_word_len=10)
             author = self.get_or_create_author(choice(self.random_usernames))
@@ -42,6 +42,7 @@ class Command(BaseCommand):
             submission.save()
 
             for _ in range(self.root_comments):
+                print("Adding thread comments...")
                 comment_author = self.get_or_create_author(choice(self.random_usernames))
                 raw_text = self.get_random_sentence(max_words=100)
                 new_comment = Comment.create(comment_author, raw_text, submission)
@@ -81,7 +82,6 @@ class Command(BaseCommand):
         return author
 
     def add_replies(self, root_comment, depth=1):
-        print("Adding comment replies...")
         if depth > 5:
             return
 
