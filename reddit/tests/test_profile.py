@@ -21,7 +21,7 @@ class TestProfileViewing(TestCase):
         r.github = "example"
 
     def test_existing_username(self):
-        r = self.c.get(reverse('User Profile', args=('username',)))
+        r = self.c.get(reverse('user_profile', args=('username',)))
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, '(username)')
         self.assertContains(r, 'compose?to=username')
@@ -33,13 +33,13 @@ class TestProfileViewing(TestCase):
 
     def test_own_username(self):
         self.assertTrue(self.c.login(username='username', password='password'))
-        r = self.c.get(reverse('User Profile', args=('username',)))
+        r = self.c.get(reverse('user_profile', args=('username',)))
         self.assertContains(r, '/profile/edit')
         self.assertNotContains(r, 'compose?to=username')
         self.c.logout()
 
     def test_invalid_username(self):
-        r = self.c.get(reverse('User Profile', args=('none',)))
+        r = self.c.get(reverse('user_profile', args=('none',)))
         self.assertEqual(r.status_code, 404)
 
 
@@ -116,26 +116,26 @@ class TestProfilePageRequests(TestCase):
         }
 
     def test_not_logged_in(self):
-        r = self.c.get(reverse('Edit Profile'))
-        self.assertRedirects(r, reverse('Login') + '?next=' + reverse('Edit Profile'))
+        r = self.c.get(reverse('edit_profile'))
+        self.assertRedirects(r, reverse('login') + '?next=' + reverse('edit_profile'))
 
     def test_invalid_request(self):
         self.c.login(username='profiletest',
                      password='password')
-        r = self.c.delete(reverse('Edit Profile'))
+        r = self.c.delete(reverse('edit_profile'))
         self.assertEqual(r.status_code, 404)
 
     def test_form_view(self):
         self.c.login(username='profiletest',
                      password='password')
-        r = self.c.get(reverse('Edit Profile'))
+        r = self.c.get(reverse('edit_profile'))
         self.assertIsInstance(r.context['form'], ProfileForm)
 
     def test_form_submit(self):
         self.c.login(username='profiletest',
                      password='password')
 
-        r = self.c.post(reverse('Edit Profile'), data=self.valid_data)
+        r = self.c.post(reverse('edit_profile'), data=self.valid_data)
         self.assertEqual(r.status_code, 200)
 
         user = RedditUser.objects.get(user=User.objects.get(

@@ -21,19 +21,19 @@ class TestFrontPageGET(TestCase):
         self.assertEqual(Submission.objects.all().count(), 50)
 
     def test_no_page_number(self):
-        r = self.c.get(reverse('Frontpage'))
+        r = self.c.get(reverse('frontpage'))
         self.assertEqual(len(r.context['submissions']), 25)
         self.assertEqual(r.context['submissions'].number, 1)
         self.assertFalse(r.context['submissions'].has_previous())
         self.assertTrue(r.context['submissions'].has_next())
 
     def test_valid_page_number(self):
-        r = self.c.get(reverse('Frontpage'), data={'page': 1})
+        r = self.c.get(reverse('frontpage'), data={'page': 1})
         self.assertEqual(len(r.context['submissions']), 25)
         first_page_submissions = r.context['submissions']
         self.assertFalse(r.context['submissions'].has_previous())
 
-        r = self.c.get(reverse('Frontpage'), data={'page': 2})
+        r = self.c.get(reverse('frontpage'), data={'page': 2})
         self.assertEqual(len(r.context['submissions']), 25)
         second_page_submissions = r.context['submissions']
         self.assertNotEqual(first_page_submissions, second_page_submissions)
@@ -41,11 +41,11 @@ class TestFrontPageGET(TestCase):
         self.assertFalse(r.context['submissions'].has_next())
 
     def test_invalid_page_number(self):
-        r = self.c.get(reverse('Frontpage'), data={'page': "something"}, follow=True)
+        r = self.c.get(reverse('frontpage'), data={'page': "something"}, follow=True)
         self.assertEqual(r.status_code, 404)
 
     def test_wrong_page_number(self):
-        r = self.c.get(reverse('Frontpage'), data={'page': 10}, follow=True)
+        r = self.c.get(reverse('frontpage'), data={'page': 10}, follow=True)
         self.assertEqual(r.context['submissions'].number, 2)
         self.assertFalse(r.context['submissions'].has_next())
 
@@ -78,13 +78,13 @@ class TestFrontpageVotes(TestCase):
                         vote_value=-1).save()
 
     def test_logged_out(self):
-        r = self.c.get(reverse('Frontpage'))
+        r = self.c.get(reverse('frontpage'))
         self.assertEqual(r.context['submission_votes'], {},
                          msg="Logged out user got some submission votes data")
 
     def test_logged_in(self):
         self.c.login(username='username', password='password')
-        r = self.c.get(reverse('Frontpage'))
+        r = self.c.get(reverse('frontpage'))
         self.assertEqual(len(r.context['submission_votes']), 5)
 
         upvote_keys = []
@@ -102,7 +102,7 @@ class TestFrontpageVotes(TestCase):
 
     def test_second_page(self):
         self.c.login(username='username', password='password')
-        r = self.c.get(reverse('Frontpage'), data={'page': 2})
+        r = self.c.get(reverse('frontpage'), data={'page': 2})
         self.assertEqual(len(r.context['submission_votes']), 4)
 
         upvote_keys = []

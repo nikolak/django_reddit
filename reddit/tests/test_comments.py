@@ -66,7 +66,7 @@ class TestViewingThreadComments(TestCase):
 
     def test_valid_public_comment_view(self):
         self.c.logout()
-        r = self.c.get(reverse('Thread', args=(1,)))
+        r = self.c.get(reverse('thread', args=(1,)))
         submission = Submission.objects.get(id=1)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context['submission'], submission)
@@ -78,7 +78,7 @@ class TestViewingThreadComments(TestCase):
 
     def test_comment_votes(self):
         self.c.login(**self.credentials)
-        r = self.c.get(reverse('Thread', args=(1,)))
+        r = self.c.get(reverse('thread', args=(1,)))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context['sub_vote'], 1)
         self.assertEqual(r.context['comment_votes'], {1: 1, 5: -1})
@@ -86,7 +86,7 @@ class TestViewingThreadComments(TestCase):
         self.assertContains(r, 'reply comment', count=2)
 
     def test_invalid_thread_id(self):
-        r = self.c.get(reverse('Thread', args=(123,)))
+        r = self.c.get(reverse('thread', args=(123,)))
         self.assertEqual(r.status_code, 404)
 
 
@@ -107,11 +107,11 @@ class TestPostingComment(TestCase):
         )
 
     def test_post_only(self):
-        r = self.c.get(reverse('Post Comment'))
+        r = self.c.get(reverse('post_comment'))
         self.assertIsInstance(r, HttpResponseNotAllowed)
 
     def test_logged_out(self):
-        r = self.c.post(reverse('Post Comment'))
+        r = self.c.post(reverse('post_comment'))
         self.assertEqual(r.status_code, 200)
         json_response = json.loads(r.content.decode("utf-8"))
         self.assertEqual(json_response['msg'], "You need to log in to post new comments.")
@@ -119,10 +119,10 @@ class TestPostingComment(TestCase):
     def test_missing_type_or_id(self):
         self.c.login(**self.credentials)
         for key in ['parentType', 'parentId']:
-            r = self.c.post(reverse('Post Comment'),
+            r = self.c.post(reverse('post_comment'),
                             data={key: 'comment'})
             self.assertIsInstance(r, HttpResponseBadRequest)
-        r = self.c.post(reverse('Post Comment'),
+        r = self.c.post(reverse('post_comment'),
                         data={'parentType': 'InvalidType',
                               'parentId': 1})
         self.assertIsInstance(r, HttpResponseBadRequest)
@@ -134,7 +134,7 @@ class TestPostingComment(TestCase):
             'parentId': 1,
             'commentContent': ''
         }
-        r = self.c.post(reverse('Post Comment'), data=test_data)
+        r = self.c.post(reverse('post_comment'), data=test_data)
         self.assertEqual(r.status_code, 200)
         json_response = json.loads(r.content.decode("utf-8"))
         self.assertEqual(json_response['msg'],
@@ -147,7 +147,7 @@ class TestPostingComment(TestCase):
             'parentId': 'invalid',
             'commentContent': 'content'
         }
-        r = self.c.post(reverse('Post Comment'), data=test_data)
+        r = self.c.post(reverse('post_comment'), data=test_data)
         self.assertIsInstance(r, HttpResponseBadRequest)
 
         test_data = {
@@ -156,7 +156,7 @@ class TestPostingComment(TestCase):
             'commentContent': 'content'
         }
 
-        r = self.c.post(reverse('Post Comment'), data=test_data)
+        r = self.c.post(reverse('post_comment'), data=test_data)
         self.assertIsInstance(r, HttpResponseBadRequest)
 
         test_data = {
@@ -165,7 +165,7 @@ class TestPostingComment(TestCase):
             'commentContent': 'content'
         }
 
-        r = self.c.post(reverse('Post Comment'), data=test_data)
+        r = self.c.post(reverse('post_comment'), data=test_data)
         self.assertIsInstance(r, HttpResponseBadRequest)
 
     def test_valid_comment_posting_thread(self):
@@ -176,7 +176,7 @@ class TestPostingComment(TestCase):
             'commentContent': 'thread root comment'
         }
 
-        r = self.c.post(reverse('Post Comment'), data=test_data)
+        r = self.c.post(reverse('post_comment'), data=test_data)
         self.assertEqual(r.status_code, 200)
         json_r = json.loads(r.content.decode("utf-8"))
         self.assertEqual(json_r['msg'], 'Your comment has been posted.')
@@ -204,7 +204,7 @@ class TestPostingComment(TestCase):
             'commentContent': 'thread reply comment'
         }
 
-        r = self.c.post(reverse('Post Comment'), data=test_data)
+        r = self.c.post(reverse('post_comment'), data=test_data)
         self.assertEqual(r.status_code, 200)
         json_r = json.loads(r.content.decode("utf-8"))
         self.assertEqual(json_r['msg'], 'Your comment has been posted.')

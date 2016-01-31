@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <form class="form-signin" method="post" action="{% url 'reddit.views.register' %}">
+    <form class="form-signin" method="post" action="{% url 'register' %}">
         {% csrf_token %}
         <h2 class="form-signin-heading">Register</h2>
 
@@ -20,6 +20,6 @@
 
 
         <button class="btn btn-lg btn-primary btn-block" type="submit" {% if user.is_authenticated %}disabled{% endif %}>Sign up</button>
-        <h5>Already have an account? <a href="{% url 'reddit.views.user_login' %}">Login</a></h5>
+        <h5>Already have an account? <a href="{% url 'login' %}">Login</a></h5>
     </form>
 {% endblock %}

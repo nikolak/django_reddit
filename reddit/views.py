@@ -1,19 +1,17 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
-from django.template.defaulttags import register
-from django.http import JsonResponse, HttpResponseBadRequest, Http404, \
-    HttpResponseForbidden, HttpResponse
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import JsonResponse, HttpResponseBadRequest, Http404, \
+    HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template.defaulttags import register
 
-from reddit.forms import UserForm, SubmissionForm, ProfileForm
+from reddit.forms import SubmissionForm
 from reddit.models import Submission, Comment, Vote
-from reddit.utils.helpers import post_only, get_only
+from reddit.utils.helpers import post_only
 from users.models import RedditUser
+
 
 @register.filter
 def get_item(dictionary, key):  # pragma: no cover
@@ -59,7 +57,7 @@ def frontpage(request):
             except Vote.DoesNotExist:
                 pass
 
-    return render(request, 'public/frontpage.html', {'submissions': submissions,
+    return render(request, 'public/frontpage.html', {'submissions'     : submissions,
                                                      'submission_votes': submission_votes})
 
 
@@ -111,117 +109,10 @@ def comments(request, thread_id=None):
             pass
 
     return render(request, 'public/comments.html',
-                  {'submission': this_submission,
-                   'comments': thread_comments,
+                  {'submission'   : this_submission,
+                   'comments'     : thread_comments,
                    'comment_votes': comment_votes,
-                   'sub_vote': sub_vote_value})
-
-
-def user_profile(request, username):
-    user = get_object_or_404(User, username=username)
-    profile = RedditUser.objects.get(user=user)
-
-    return render(request, 'public/profile.html', {'profile': profile})
-
-
-@login_required
-def edit_profile(request):
-    user = RedditUser.objects.get(user=request.user)
-
-    if request.method == 'GET':
-        profile_form = ProfileForm(instance=user)
-
-    elif request.method == 'POST':
-        profile_form = ProfileForm(request.POST, instance=user)
-        if profile_form.is_valid():
-            profile = profile_form.save(commit=False)
-            profile.update_profile_data()
-            profile.save()
-            messages.success(request, "Profile settings saved")
-    else:
-        raise Http404
-
-    return render(request, 'private/edit_profile.html', {'form': profile_form})
-
-
-def user_login(request):
-    """
-    Pretty straighforward user authentication using password and username
-    supplied in the POST request.
-    """
-
-    if request.user.is_authenticated():
-        messages.warning(request, "You are already logged in.")
-        return render(request, 'public/login.html')
-
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        if not username or not password:
-            return HttpResponseBadRequest()
-
-        user = authenticate(username=username,
-                            password=password)
-
-        if user:
-            if user.is_active:
-                login(request, user)
-                redirect_url = request.POST.get('next') or 'Frontpage'
-                return redirect(redirect_url)
-            else:
-                return render(request, 'public/login.html',
-                              {'login_error': "Account disabled"})
-        else:
-            return render(request, 'public/login.html',
-                          {'login_error': "Wrong username or password."})
-
-    return render(request, 'public/login.html')
-
-
-@post_only
-def user_logout(request):
-    """
-    Log out user if one is logged in and redirect them to frontpage.
-    """
-
-    if request.user.is_authenticated():
-        redirect_page = request.POST.get('current_page', '/')
-        logout(request)
-        messages.success(request, 'Logged out!')
-        return redirect(redirect_page)
-    return redirect('Frontpage')
-
-
-def register(request):
-    """
-    Handles user registration using UserForm from forms.py
-    Creates new User and new RedditUser models if appropriate data
-    has been supplied.
-
-    If account has been created user is redirected to login page.
-    """
-    user_form = UserForm()
-    if request.user.is_authenticated():
-        messages.warning(request,
-                        'You are already registered and logged in.')
-        return render(request, 'public/register.html', {'form': user_form})
-
-    if request.method == "POST":
-        user_form = UserForm(request.POST)
-
-        if user_form.is_valid():
-            user = user_form.save()
-            user.set_password(user.password)
-            user.save()
-            reddit_user = RedditUser()
-            reddit_user.user = user
-            reddit_user.save()
-            user = authenticate(username=request.POST['username'],
-                                password=request.POST['password'])
-            login(request, user)
-            return redirect('Frontpage')
-
-    return render(request, 'public/register.html', {'form': user_form})
+                   'sub_vote'     : sub_vote_value})
 
 
 @post_only
@@ -234,8 +125,8 @@ def post_comment(request):
     raw_comment = request.POST.get('commentContent', None)
 
     if not all([parent_id, parent_type]) or \
-                    parent_type not in ['comment', 'submission'] or \
-            not parent_id.isdigit():
+            parent_type not in ['comment', 'submission'] or \
+        not parent_id.isdigit():
         return HttpResponseBadRequest()
 
     if not raw_comment:
@@ -293,7 +184,7 @@ def vote(request):
     # if one of the objects is None, 0 or some other bool(value) == False value
     # or if the object type isn't 'comment' or 'submission' it's a bad request
     if not all([vote_object_type, vote_object_id, new_vote_value]) or \
-                    vote_object_type not in ['comment', 'submission']:
+            vote_object_type not in ['comment', 'submission']:
         return HttpResponseBadRequest()
 
     # Try and get the actual object we're voting on.
@@ -322,7 +213,7 @@ def vote(request):
                            vote_value=new_vote_value)
         vote.save()
         vote_diff = new_vote_value
-        return JsonResponse({'error': None,
+        return JsonResponse({'error'   : None,
                              'voteDiff': vote_diff})
 
     # User already voted on this item, this means the vote is either
@@ -340,7 +231,7 @@ def vote(request):
             return HttpResponseBadRequest(
                 'Wrong values for old/new vote combination')
 
-    return JsonResponse({'error': None,
+    return JsonResponse({'error'   : None,
                          'voteDiff': vote_diff})
 
 

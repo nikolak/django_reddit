@@ -75,7 +75,7 @@ class RegistrationPostTestCase(TestCase):
     def test_logged_in(self):
         User.objects.create_user(username='regtest', password='password')
         self.c.login(username='regtest', password='password')
-        r = self.c.get(reverse('Register'))
+        r = self.c.get(reverse('register'))
         self.assertContains(r, 'You are already registered and logged in.')
         self.assertContains(r, 'type="submit" disabled')
 
@@ -83,8 +83,8 @@ class RegistrationPostTestCase(TestCase):
         test_data = {'username': 'username',
                      'password': 'password'}
 
-        response = self.c.post(reverse('Register'), data=test_data)
-        self.assertRedirects(response, reverse('Frontpage'))
+        response = self.c.post(reverse('register'), data=test_data)
+        self.assertRedirects(response, reverse('frontpage'))
 
         user = User.objects.filter(username=test_data['username']).first()
         self.assertIsNotNone(user,
@@ -103,7 +103,7 @@ class RegistrationPostTestCase(TestCase):
         test_data = {'username': 'invalid_too_long_username',
                      'password': '_'}
 
-        response = self.c.post(reverse('Register'), data=test_data)
+        response = self.c.post(reverse('register'), data=test_data)
         self.assertEqual(response.status_code, 200,
                          msg="Form submission failed, but a registration page was not returned again")
         self.assertIsNone(
@@ -113,5 +113,5 @@ class RegistrationPostTestCase(TestCase):
                          msg="Invalid user data can be used to login")
 
     def test_malformed_post_request(self):
-        response = self.c.post(reverse('Register'), data={'a': "a", 1: "b"})
+        response = self.c.post(reverse('register'), data={'a': "a", 1: "b"})
         self.assertContains(response, 'This field is required.', count=2)

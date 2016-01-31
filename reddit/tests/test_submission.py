@@ -47,14 +47,14 @@ class TestSubmissionRequests(TestCase):
         )
 
     def test_logged_out(self):
-        r = self.c.get(reverse('Submit'))
+        r = self.c.get(reverse('submit'))
         self.assertRedirects(r, "{}?next={}".format(
-            reverse('Login'), reverse('Submit')
+            reverse('login'), reverse('submit')
         ))
 
     def test_logged_in_GET(self):
         self.c.login(**self.login_data)
-        r = self.c.get(reverse('Submit'))
+        r = self.c.get(reverse('submit'))
         self.assertIsInstance(r.context['form'], SubmissionForm)
 
     def test_making_a_submission(self):
@@ -64,10 +64,10 @@ class TestSubmissionRequests(TestCase):
             'url': 'http://example.com',
             'text': 'submission text'
         }
-        r = self.c.post(reverse('Submit'), data=test_data, follow=True)
+        r = self.c.post(reverse('submit'), data=test_data, follow=True)
         submission = Submission.objects.filter(**test_data).first()
         self.assertIsNotNone(submission)
-        self.assertRedirects(r, reverse('Thread', args=(submission.id,)))
+        self.assertRedirects(r, reverse('thread', args=(submission.id,)))
         self.assertContains(r, 'Submission created')
 
     def test_missing_fields(self):
@@ -77,6 +77,6 @@ class TestSubmissionRequests(TestCase):
             'url': 'http://example.com',
             'text': 'submission text'
         }
-        r = self.c.post(reverse('Submit'), data=test_data)
+        r = self.c.post(reverse('submit'), data=test_data)
         self.assertNotContains(r, 'Submission created')
         self.assertContains(r, 'This field is required.')

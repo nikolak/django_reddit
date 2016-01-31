@@ -32,7 +32,7 @@ class TestVotingOnItems(TestCase):
                        parent=submission).save()
 
     def test_post_only(self):
-        r = self.c.get(reverse('Vote'))
+        r = self.c.get(reverse('vote'))
         self.assertIsInstance(r, HttpResponseNotAllowed)
 
     def test_logged_out(self):
@@ -42,7 +42,7 @@ class TestVotingOnItems(TestCase):
             'vote_value': 1
         }
 
-        r = self.c.post(reverse('Vote'), data=test_data)
+        r = self.c.post(reverse('vote'), data=test_data)
         self.assertIsInstance(r, HttpResponseForbidden)
 
     def test_invalid_vote_value(self):
@@ -52,30 +52,30 @@ class TestVotingOnItems(TestCase):
             'what_id': 1,
             'vote_value': '2'
         }
-        r = self.c.post(reverse('Vote'), data=test_data)
+        r = self.c.post(reverse('vote'), data=test_data)
         self.assertIsInstance(r, HttpResponseBadRequest)
 
     def test_missing_arugmnets(self):
         self.c.login(**self.credentials)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'submission',
                             'what_id': 1
                         })
         self.assertIsInstance(r, HttpResponseBadRequest)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'submission',
                             'vote_value': '1'
                         })
         self.assertIsInstance(r, HttpResponseBadRequest)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what_id': '1',
                             'vote_value': '1'
                         })
         self.assertIsInstance(r, HttpResponseBadRequest)
-        r = self.c.post(reverse('Vote'), data={})
+        r = self.c.post(reverse('vote'), data={})
         self.assertIsInstance(r, HttpResponseBadRequest)
 
     def test_invalid_vote_object_id(self):
@@ -86,14 +86,14 @@ class TestVotingOnItems(TestCase):
                 'what_id': 9999,
                 'what_value': '1'
             }
-            r = self.c.post(reverse('Vote'), data=test_data)
+            r = self.c.post(reverse('vote'), data=test_data)
             self.assertIsInstance(r, HttpResponseBadRequest)
 
     def test_submission_first_vote(self):
         submission = Submission.objects.filter(title="vote testing").first()
         self.assertIsNotNone(submission)
         self.c.login(**self.credentials)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'submission',
                             'what_id': submission.id,
@@ -115,7 +115,7 @@ class TestVotingOnItems(TestCase):
         Vote.create(user=user, vote_object=submission, vote_value=1).save()
 
         self.c.login(**self.credentials)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'submission',
                             'what_id': submission.id,
@@ -133,7 +133,7 @@ class TestVotingOnItems(TestCase):
         vote.save()
 
         self.c.login(**self.credentials)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'submission',
                             'what_id': submission.id,
@@ -150,7 +150,7 @@ class TestVotingOnItems(TestCase):
         comment = Comment.objects.filter(submission=submission).first()
         self.assertIsNotNone(comment)
         self.c.login(**self.credentials)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'comment',
                             'what_id': comment.id,
@@ -174,7 +174,7 @@ class TestVotingOnItems(TestCase):
         Vote.create(user=user, vote_object=comment, vote_value=1).save()
 
         self.c.login(**self.credentials)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'comment',
                             'what_id': comment.id,
@@ -192,7 +192,7 @@ class TestVotingOnItems(TestCase):
         vote.save()
 
         self.c.login(**self.credentials)
-        r = self.c.post(reverse('Vote'),
+        r = self.c.post(reverse('vote'),
                         data={
                             'what': 'comment',
                             'what_id': comment.id,

@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <form class="form-signin" method="post" action="{% url 'reddit.views.user_login' %}">
+    <form class="form-signin" method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.GET.next }}"/>
 
@@ -16,6 +16,6 @@
             <p class="text-danger">{{ login_error }}</p>
         {% endif %}
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-        <h5>Need an account? <a href="{% url 'reddit.views.register' %}">register</a></h5>
+        <h5>Need an account? <a href="{% url 'register' %}">register</a></h5>
     </form>
 {% endblock %}
